@@ -5,7 +5,7 @@
 .git/
 web/Logs/
 web/App_Data/
-data/
+/data/
 *.user
 build_*.log
 .env
