@@ -6,6 +6,8 @@
 web/Logs/
 web/App_Data/
 /data/
+!/web/Data/
+!/web/Data/**
 *.user
 build_*.log
 .env

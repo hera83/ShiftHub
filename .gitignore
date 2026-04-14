@@ -17,7 +17,9 @@ build_*.log
 web/App_Data/
 
 # Docker runtime data
-data/
+/data/
+!/web/Data/
+!/web/Data/**
 
 # Docker environment (indeholder passwords og hemmelige noegler)
 .env
