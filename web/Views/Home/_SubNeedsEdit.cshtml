@@ -1,0 +1,161 @@
+﻿@model ShiftHub.Models.HomeModels
+
+<div class="modal fade">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Rediger behov</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <table border="0" width="100%">
+                    <tr>
+                        <td style="height: 30vh;">
+                            <canvas id="myChart"></canvas>
+                            <div type="hidden" style="display: none;" id="chartData">@Html.Raw($"{Model.SubNeeds.jsonNeeds}")</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td id="ChartEdit">
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="SaveNeeds()">Gem</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Luk</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var runOnStart = InitChart();
+
+    function InitChart() {
+        var dataObj = JSON.parse(document.getElementById("chartData").innerHTML);
+        window.localStorage.setItem("DataObj", JSON.stringify(dataObj));
+
+        UpdateChart();
+    }
+    function HourUp(hourId) {
+        var dataObj = JSON.parse(window.localStorage.getItem("DataObj"));
+
+        dataObj.data[hourId] = dataObj.data[hourId] + 1;
+
+        window.localStorage.setItem("DataObj", JSON.stringify(dataObj));
+        UpdateChart();
+    }
+    function HourDown(hourId) {
+        var dataObj = JSON.parse(window.localStorage.getItem("DataObj"));
+
+        if (dataObj.data[hourId] > 0) {
+            dataObj.data[hourId] = dataObj.data[hourId] - 1;
+
+            window.localStorage.setItem("DataObj", JSON.stringify(dataObj));
+            UpdateChart();
+        }
+    }
+    function UpdateChart() {
+        var dataObj = JSON.parse(window.localStorage.getItem("DataObj"));
+        var chartEdit = "";
+
+        var chart = new Chart("myChart", {
+            type: 'bar',
+            data: {
+                labels: dataObj.labels,
+                datasets: [{
+                    data: dataObj.data,
+                    backgroundColor: '#aebfd1'
+                }]
+            },
+            options: {
+                events: false,
+                tooltips: {
+                    enabled: false
+                },
+                hover: {
+                    animationDuration: 0
+                },
+                animation: {
+                    duration: 1,
+                    onComplete: function () {
+                        var chartInstance = this.chart,
+                            ctx = chartInstance.ctx;
+                        ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'bottom';
+
+                        this.data.datasets.forEach(function (dataset, i) {
+                            var meta = chartInstance.controller.getDatasetMeta(i);
+                            meta.data.forEach(function (bar, index) {
+                                var data = dataset.data[index];
+                                ctx.fillText(data, bar._model.x, bar._model.y - 5);
+                            });
+                        });
+                    }
+                },
+                legend: {
+                    display: false
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            stepSize: 1
+                        }
+                    }]
+                }
+            }
+        });
+
+        for (let i = 0; i < dataObj.labels.length; i++) {
+            if (i == 0) {
+                chartEdit += "<table width=\"100%\"><tr><td width=\"28\"></td>";
+            }
+
+            chartEdit += "<td>" +
+                "<table width=\"100%\">" +
+                    "<tr>" +
+                        "<td align=\"center\" valign=\"middle\">" +
+                            "<i class=\"bi bi-arrow-up-circle\" style=\"cursor: pointer; color: green;\" onclick=\"HourUp('" + i + "')\" title=\"Tilføj\"></i>" +
+                        "</td>" +
+                    "</tr>" +
+                    "<tr>" +
+                        "<td align=\"center\" valign=\"middle\">" +
+                            "<i class=\"bi bi-arrow-down-circle\" style=\"cursor: pointer; color: lightcoral;\" onclick=\"HourDown('" + i + "')\" title=\"Fjern\"></i>" +
+                        "</td>" +
+                    "</tr>" +
+                "</table>" +
+            "</td>";
+
+            if (i == dataObj.labels.length) {
+                chartEdit += "</tr></table>";
+            }
+        }
+
+        if (dataObj.labels.length > 0) {
+            document.getElementById("ChartEdit").innerHTML = chartEdit;
+        } else {
+            document.getElementById("ChartEdit").innerHTML = "";
+        }
+    }
+
+    function SaveNeeds() {
+        var PlaceHolderElement = $('#PopUpPlaceholder');
+        var subGroupId = document.getElementById("SubGroupValue").value;
+        var dataObj = window.localStorage.getItem("DataObj");
+
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_SubNeedsSave",
+            data: { SubGroupId: subGroupId, SubShiftId: '@Html.Raw(Model.SubShifts.ShiftsId)', JsonData: dataObj }
+        }).done(function (returned) {
+            needsUpdate(subGroupId);
+            PlaceHolderElement.find('.modal').modal('hide');
+        });
+    }
+
+</script>

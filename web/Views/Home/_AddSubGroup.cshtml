@@ -1,0 +1,45 @@
+﻿@model ShiftHub.Models.HomeModels
+
+<div class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Opret gruppe</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <form action="AddSubGroup" method="post">
+                    <div class="form-group">
+                        <label asp-for="SubGroups.Name">Navn</label>
+                        <input asp-for="SubGroups.Name" onkeyup="vSave()" class="form-control" id="NameId" />
+                        <span asp-validation-for="SubGroups.Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="SubGroups.Description">Beskrivelse</label>
+                        <textarea asp-for="SubGroups.Description" rows="3" class="form-control"></textarea>
+                        <span asp-validation-for="SubGroups.Description" class="text-danger"></span>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-save="modal" id="SubmitId" disabled>Opret</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Luk</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function vSave() {
+        let NameValue = document.getElementById("NameId").value;
+
+        if (NameValue.length > 2) {
+            document.getElementById("SubmitId").disabled = false;
+        } else {
+            document.getElementById("SubmitId").disabled = true;
+        }
+    }
+</script>

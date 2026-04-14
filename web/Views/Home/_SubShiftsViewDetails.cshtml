@@ -1,0 +1,71 @@
+﻿@model ShiftHub.Models.HomeModels
+
+<div class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Bruger detaljer</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <form action="SubStaffDetails" method="post">
+                    <div class="form-group">
+                        <label asp-for="Staff.Name">Navn</label>
+                        <input asp-for="Staff.Name" class="form-control" readonly />
+                        <span asp-validation-for="Staff.Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Staff.Address">Adresse</label>
+                        <input asp-for="Staff.Address" class="form-control" readonly />
+                        <span asp-validation-for="Staff.Address" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Staff.ZipCode">Post Nr.</label>
+                        <input asp-for="Staff.ZipCode" class="form-control" readonly />
+                        <span asp-validation-for="Staff.ZipCode" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Staff.City">By</label>
+                        <input asp-for="Staff.City" class="form-control" readonly />
+                        <span asp-validation-for="Staff.City" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Staff.Birthday">Fødselsdag</label>
+                        <input type="date" asp-for="Staff.Birthday" class="form-control" readonly />
+                        <span asp-validation-for="Staff.Birthday" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Staff.Mail">Mail</label>
+                        <input type="email" asp-for="Staff.Mail" class="form-control" readonly />
+                        <span asp-validation-for="Staff.Mail" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Staff.Phone">Telefon Nr</label>
+                        <input asp-for="Staff.Phone" class="form-control" readonly />
+                        <span asp-validation-for="Staff.Phone" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Staff.Key1">Key1</label>
+                        <input asp-for="Staff.Key1" class="form-control" readonly />
+                        <span asp-validation-for="Staff.Key1" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Staff.Key2">Key2</label>
+                        <input asp-for="Staff.Key2" class="form-control" readonly />
+                        <span asp-validation-for="Staff.Key2" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Staff.Key3">Key3</label>
+                        <input asp-for="Staff.Key3" class="form-control" readonly />
+                        <span asp-validation-for="Staff.Key3" class="text-danger"></span>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Luk</button>
+            </div>
+        </div>
+    </div>
+</div>

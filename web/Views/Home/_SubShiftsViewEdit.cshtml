@@ -1,0 +1,125 @@
+﻿@model ShiftHub.Models.HomeModels
+
+<div class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Rediger vagter</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                @foreach (System.Data.DataRow aRow in Model.Data.aTable.Rows)
+                {
+                    @if ($"{aRow["Type"]}" == "Fixed")
+                    {
+                        @if (Model.Data.aTable.Rows.IndexOf(aRow) == 0)
+                        {
+                            @Html.Raw($"<div class=\"form-group\"><label for=\"{aRow["WeekDay"]}\">{aRow["WeekDay"]}</label><select name=\"{aRow["WeekDay"]}\" class=\"form-control shiftChoice\"><option></option>")
+                        }
+                        else if ($"{aRow["WeekDay"]}" != $"{Model.Data.aTable.Rows[(Model.Data.aTable.Rows.IndexOf(aRow) - 1)]["WeekDay"]}")
+                        {
+                            @Html.Raw($"</select></div>")
+                            @Html.Raw($"<div class=\"form-group\"><label for=\"{aRow["WeekDay"]}\">{aRow["WeekDay"]}</label><select name=\"{aRow["WeekDay"]}\" class=\"form-control shiftChoice\"><option></option>")
+                        }
+
+                        @Html.Raw($"<option title=\"Behov: {aRow["StaffNeeds"]}\" value=\"{aRow["ShiftId"]}\"") @if ($"{aRow["Selected"]}" == "1") { @Html.Raw(" SELECTED") } @Html.Raw($">{aRow["Name"]} ({Convert.ToDateTime($"{aRow["SubStartTime"]}").ToString("HH:mm")} - {Convert.ToDateTime($"{aRow["SubEndTime"]}").AddMinutes(1).ToString("HH:mm")})</option>")
+
+                        @if ((Model.Data.aTable.Rows.IndexOf(aRow) + 1) == Model.Data.aTable.Rows.Count)
+                        {
+                            @Html.Raw($"</select></div>")
+                        }
+                    }
+                }
+                <hr />
+                <div class="form-group form-switch">
+                    <input type="checkbox" name="notification" class="form-check-input" id="notificationId" />&nbsp;
+                    <label for="notification">Send bekræftigelse</label>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" onclick="ShiftsSave()">Gem</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Luk</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var runOnStart = NotificationCheck();
+
+    function NotificationCheck() {
+        var mail = '@Html.Raw($"{Model.Staff.Mail}")';
+        
+        if (mail == '') {
+            document.getElementById("notificationId").disabled = true;
+        }
+    }
+    function ShiftsSave() {
+        var PlaceHolderElement = $('#PopUpPlaceholder');
+        var SubGroupId = document.getElementById("SubGroupValue").value;
+        const choices = document.getElementsByClassName("shiftChoice");
+        const shiftsSelected = [];
+        let shifts = 0;
+        var UiD = new Date().getTime();
+        const regex = new RegExp('OK');
+
+        /* Count Shifts */
+        for (let i = 0; i < choices.length; i++) {
+            if (choices[i].value != '') {
+                shiftsSelected[shifts] = choices[i].value;
+                shifts++;
+            }
+        }
+
+        $.ajax({
+            url: "/Home/_SubShiftsViewEditSave",
+            data: { SubGroupId: SubGroupId, StaffId: '@Html.Raw($"{Model.Staff.StaffId}")', Shifts: JSON.stringify(shiftsSelected), Notification: document.getElementById("notificationId").checked },
+            dataType: "text"
+        }).done(function (returned) {
+            PlaceHolderElement.find('.modal').modal('hide');
+
+            if (regex.test(returned) == true) {
+                var saveState = 'Gemt';
+
+                if (document.getElementById("notificationId").checked == true) {
+                    saveState = 'Gemt & Sendt';
+                }
+
+                document.getElementById("AlertPlaceholder").innerHTML = "<div class=\"alert alert-success d-flex align-items-center bs-popover-start\" role=\"alert\">" +
+                    "<table width=\"100%\">" +
+                        "<tr>" +
+                            "<td align=\"left\" valign=\"middle\" style=\"font-size: 16px;\">" +
+                                "<i class=\"bi bi-check-circle\"></i>&nbsp;&nbsp;" +
+                                saveState +
+                            "</td>" +
+                            "<td align=\"right\" valign=\"middle\">" +
+                                "<button type=\"button\" id=\"" + UiD + "\" class=\"btn-close\" data-bs-dismiss=\"alert\" title=\"Luk\"></button>" +
+                            "</td>" +
+                        "</tr>" +
+                    "</table>" +
+                    "<script type=\"text/javascript\">" +
+                        "setTimeout(function () {" +
+                            "document.getElementById('" + UiD + "').click();" +
+                        "}, 3000);" +
+                    "<\/script>" +
+                "</div>";
+            } else {
+                document.getElementById("AlertPlaceholder").innerHTML = "<div class=\"alert alert-danger d-flex align-items-center bs-popover-start\" role=\"alert\">" +
+                    "<table width=\"100%\">" +
+                        "<tr>" +
+                            "<td align=\"left\" valign=\"middle\" style=\"font-size: 16px;\">" +
+                    "<i class=\"bi bi-exclamation-diamond\"></i>&nbsp;&nbsp;" +
+                                returned +
+                            "</td>" +
+                            "<td align=\"right\" valign=\"middle\">" +
+                                "<button type=\"button\" id=\"" + UiD + "\" class=\"btn-close\" data-bs-dismiss=\"alert\" title=\"Luk\"></button>" +
+                            "</td>" +
+                        "</tr>" +
+                    "</table>" +
+                "</div>";
+            }
+        });
+    }
+    
+</script>

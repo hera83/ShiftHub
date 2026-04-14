@@ -1,0 +1,145 @@
+﻿@model ShiftHub.Models.HomeModels
+
+<div class="modal fade">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content" style="height: 90vh;">
+            <div class="modal-header">
+                <h4 class="modal-title">Send besked</h4>&nbsp;
+                <button type="button" class="btn lightButton" title="Flettefelter:&#013;#navn&#013;#adresse&#013;#postnr&#013;#by&#013;#foedselsdag&#013;#mail&#013;#telefonnr&#013;#key1&#013;#key2&#013;#key3">
+                    <i class="bi bi-link-45deg" style="font-size: 1rem; color: gray;"></i>
+                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <table border="0" width="100%" height="100%">
+                    <tr>
+                        <td align="left" valign="middle" width="120px" height="41px">
+                            Modtager(e)&nbsp;
+                        </td>
+                        <td align="left" valign="middle">
+                            <select class="form-control form-control-sm" onchange="SendValidation()" id="ReciverId">
+                                <optgroup label="Grupper">
+                                    <option>Alle</option>
+                                    <option>Tilmeldte</option>
+                                    <option>Ikke tilmeldte</option>
+                                </optgroup>
+                                <optgroup label="Brugere" id="StaffList">
+                                    <option selected></option>
+                                </optgroup>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left" valign="middle" width="120px" height="41px">
+                            Emne&nbsp;
+                        </td>
+                        <td align="left" valign="middle">
+                            <input type="text" class="form-control form-control-sm" onkeyup="SendValidation()" onchange="SendValidation()" id="SubjectId" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" height="5px"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" align="left" valign="middle">
+                            <textarea class="form-control" style="width: 100%; height: 100%;" onkeyup="SendValidation()" id="MessageId"></textarea>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-success" onclick="SendMessage()" id="SendId" disabled>Send</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var runOnLoad = GetStaffList();
+
+    function GetStaffList() {
+        var subGroupId = document.getElementById("SubGroupValue").value;
+
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_SubMessagesGetStaff",
+            data: { SubGroupId: subGroupId }
+        }).done(function (returned) {
+            var dataObj = JSON.parse(returned);
+            var mailValid = '';
+
+            for (let i = 0; i < dataObj.Staff.length; i++) {
+                if (dataObj.Staff[i].Mail == '') {
+                    mailValid = ' disabled';
+                } else {
+                    mailValid = '';
+                }
+
+                document.getElementById("StaffList").insertAdjacentHTML('beforeend', '<option value=\"' + dataObj.Staff[i].StaffId + '\"' + mailValid + '>' + dataObj.Staff[i].Name + '</option>');
+            }
+        });
+    }
+    function SendValidation() {
+        var ReciverValue = document.getElementById("ReciverId").value;
+        var SubjectValue = document.getElementById("SubjectId").value;
+        var MessageValue = document.getElementById("MessageId").value;
+
+        if (ReciverValue != '' && SubjectValue != '' && MessageValue != '') {
+            document.getElementById("SendId").disabled = false;
+        } else {
+            document.getElementById("SendId").disabled = true;
+        }
+    }
+    function SendMessage() {
+        var PlaceHolderElement = $('#PopUpPlaceholder');
+        var subGroupId = document.getElementById("SubGroupValue").value;
+        var UiD = new Date().getTime();
+        const regex = new RegExp('OK');
+
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_SubMessagesSend",
+            data: { SubGroupId: subGroupId, Reciver: document.getElementById("ReciverId").value, Subject: document.getElementById("SubjectId").value, Message: document.getElementById("MessageId").value }
+        }).done(function (returned) {
+            PlaceHolderElement.find('.modal').modal('hide');
+
+            if (regex.test(returned) == true) {
+                document.getElementById("AlertPlaceholder").innerHTML = "<div class=\"alert alert-success d-flex align-items-center bs-popover-start\" role=\"alert\">" +
+                    "<table width=\"100%\">" +
+                        "<tr>" +
+                            "<td align=\"left\" valign=\"middle\" style=\"font-size: 16px;\">" +
+                                "<i class=\"bi bi-check-circle\"></i>&nbsp;&nbsp;" +
+                                "Sendt" +
+                            "</td>" +
+                            "<td align=\"right\" valign=\"middle\">" +
+                                "<button type=\"button\" id=\"" + UiD + "\" class=\"btn-close\" data-bs-dismiss=\"alert\" title=\"Luk\"></button>" +
+                            "</td>" +
+                        "</tr>" +
+                    "</table>" +
+                    "<script type=\"text/javascript\">" +
+                        "setTimeout(function () {" +
+                            "document.getElementById('" + UiD + "').click();" +
+                        "}, 3000);" +
+                    "<\/script>" +
+                "</div>";
+            } else {
+                document.getElementById("AlertPlaceholder").innerHTML = "<div class=\"alert alert-danger d-flex align-items-center bs-popover-start\" role=\"alert\">" +
+                    "<table width=\"100%\">" +
+                        "<tr>" +
+                            "<td align=\"left\" valign=\"middle\" style=\"font-size: 16px;\">" +
+                    "<i class=\"bi bi-exclamation-diamond\"></i>&nbsp;&nbsp;" +
+                                returned +
+                            "</td>" +
+                            "<td align=\"right\" valign=\"middle\">" +
+                                "<button type=\"button\" id=\"" + UiD + "\" class=\"btn-close\" data-bs-dismiss=\"alert\" title=\"Luk\"></button>" +
+                            "</td>" +
+                        "</tr>" +
+                    "</table>" +
+                "</div>";
+            }
+        });
+    }
+
+</script>

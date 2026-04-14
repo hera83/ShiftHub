@@ -1,0 +1,124 @@
+﻿@model ShiftHub.Models.HomeModels
+
+<div class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Tilføj dag</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label asp-for="SubDays.DayStart">Start dag</label>
+                    <input type="date" asp-for="SubDays.DayStart" onchange="checkStart(this)" class="form-control" min="@DateTime.Now.ToString("yyyy-MM-dd")" id="startId" />
+                    <span asp-validation-for="SubDays.DayStart" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="SubDays.DayEnd">Slut dag</label>
+                    <input type="date" asp-for="SubDays.DayEnd" onchange="checkEnd(this)" class="form-control" min="@DateTime.Now.ToString("yyyy-MM-dd")" id="endId" />
+                    <span asp-validation-for="SubDays.DayEnd" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="SubDays.Key1">Key</label>
+                    <input asp-for="SubDays.Key1" class="form-control" onkeyup="checkKey()" id="keyId" />
+                    <span asp-validation-for="SubDays.Key1" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="addDays()" id="addId">Tilføj</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Luk</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    daysValidate();
+
+    function checkKey() {
+        // Fjern alle mellemrum for key (Ellers virker validering ikke i tilmeldingen)
+        let ValueKey = document.getElementById('keyId').value.replace(' ', '')
+            .replace('0', '').replace('1', '').replace('2', '').replace('3', '').replace('4', '')
+            .replace('5', '').replace('6', '').replace('7', '').replace('8', '').replace('9', '');
+        document.getElementById('keyId').value = ValueKey;
+    }
+    function checkStart(element) {
+        daysValidate();
+        document.getElementById("endId").value = document.getElementById("startId").value;
+    }
+    function checkEnd(element) {
+        daysValidate();
+        if (document.getElementById("endId").value < document.getElementById("startId").value) {
+            document.getElementById("endId").value = document.getElementById("startId").value
+        }
+    }
+    function daysValidate() {
+        var subGroupId = document.getElementById("SubGroupValue").value;
+        const regex = new RegExp('OK');
+
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_SubDaysAddValidate",
+            data: { SubGroupId: subGroupId, DayStart: document.getElementById("startId").value, DayEnd: document.getElementById("endId").value }
+        }).done(function (returned) {
+            if (regex.test(returned) == true) {
+                document.getElementById("addId").disabled = false;
+            } else {
+                document.getElementById("addId").disabled = true;
+            }
+        });
+    }
+    function addDays() {
+        var PlaceHolderElement = $('#PopUpPlaceholder');
+        var subGroupId = document.getElementById("SubGroupValue").value;
+        var UiD = new Date().getTime();
+        const regex = new RegExp('OK');
+
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_SubDaysAdd",
+            data: { SubGroupId: subGroupId, DayStart: document.getElementById("startId").value, DayEnd: document.getElementById("endId").value, Key1: document.getElementById("keyId").value }
+        }).done(function (returned) {
+            daysUpdate(subGroupId);
+            PlaceHolderElement.find('.modal').modal('hide');
+
+            if (regex.test(returned) == true) {
+                document.getElementById("AlertPlaceholder").innerHTML = "<div class=\"alert alert-success d-flex align-items-center bs-popover-start\" role=\"alert\">" +
+                    "<table width=\"100%\">" +
+                        "<tr>" +
+                            "<td align=\"left\" valign=\"middle\" style=\"font-size: 16px;\">" +
+                                "<i class=\"bi bi-check-circle\"></i>&nbsp;&nbsp;" +
+                                "Gemt" +
+                            "</td>" +
+                            "<td align=\"right\" valign=\"middle\">" +
+                                "<button type=\"button\" id=\"" + UiD + "\" class=\"btn-close\" data-bs-dismiss=\"alert\" title=\"Luk\"></button>" +
+                            "</td>" +
+                        "</tr>" +
+                    "</table>" +
+                    "<script type=\"text/javascript\">" +
+                        "setTimeout(function () {" +
+                            "document.getElementById('" + UiD + "').click();" +
+                        "}, 3000);" +
+                    "<\/script>" +
+                "</div>";
+            } else {
+                document.getElementById("AlertPlaceholder").innerHTML = "<div class=\"alert alert-danger d-flex align-items-center bs-popover-start\" role=\"alert\">" +
+                    "<table width=\"100%\">" +
+                        "<tr>" +
+                            "<td align=\"left\" valign=\"middle\" style=\"font-size: 16px;\">" +
+                    "<i class=\"bi bi-exclamation-diamond\"></i>&nbsp;&nbsp;" +
+                                returned +
+                            "</td>" +
+                            "<td align=\"right\" valign=\"middle\">" +
+                                "<button type=\"button\" id=\"" + UiD + "\" class=\"btn-close\" data-bs-dismiss=\"alert\" title=\"Luk\"></button>" +
+                            "</td>" +
+                        "</tr>" +
+                    "</table>" +
+                "</div>";
+            }
+        });
+    }
+
+</script>

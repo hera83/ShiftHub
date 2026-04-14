@@ -1,0 +1,52 @@
+﻿@model ShiftHub.Models.HomeModels
+
+<div class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Rediger post</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label asp-for="SubPost.Name">Navn</label>
+                    <input asp-for="SubPost.Name" class="form-control" id="NameId" />
+                    <span asp-validation-for="SubPost.Name" class="text-danger"></span>
+                </div>
+                <hr />
+                <div class="form-group">
+                    <label asp-for="SubPost.MaxTime">Max tid (Minutter)</label>
+                    <input asp-for="SubPost.MaxTime" type="number" min="0" max="1440" class="form-control" id="MaxTimeId" />
+                    <span asp-validation-for="SubPost.MaxTime" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="Save()">Gem</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Luk</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function Save() {
+        var PlaceHolderElement = $('#PopUpPlaceholder');
+        var PostGroupId = @Html.Raw($"{Model.SubPost.Id}");
+        var PostNameValue = document.getElementById("NameId").value;
+        var MaxTimeValue = document.getElementById("MaxTimeId").value;
+
+        $.ajax({
+            type: 'POST',
+            url: '/Home/_SubPostEdit',
+            data: { Id: PostGroupId, Name: PostNameValue, MaxTime: MaxTimeValue }
+        }).done(function (returned) {
+            document.getElementById('PostNameValue_' + PostGroupId).innerHTML = '<b>' + PostNameValue + '</b>'
+            PlaceHolderElement.find('.modal').modal('hide');
+
+            updateStaffs('once');
+        });
+    }
+
+</script>

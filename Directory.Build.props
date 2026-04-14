@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup Condition="!$([System.String]::Copy('$(MSBuildProjectDirectory)').Replace('/', '\\').EndsWith('\\web')) and Exists('$(MSBuildThisFileDirectory)web\ShiftHub.csproj')">
+    <BaseOutputPath>$(MSBuildThisFileDirectory)web\bin\</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)web\obj\</BaseIntermediateOutputPath>
+    <MSBuildProjectExtensionsPath>$(BaseIntermediateOutputPath)</MSBuildProjectExtensionsPath>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,52 @@
+﻿@model ShiftHub.Models.HomeModels
+
+<div class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Aktiver gruppe</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <form action="SubFormActivate" method="post">
+                    <input type="hidden" asp-for="SubGroups.SubGroupId" />
+
+                    <div class="form-group">
+                        <label asp-for="SubGroups.Name">Navn</label>
+                        <input asp-for="SubGroups.Name" class="form-control" readonly />
+                        <span asp-validation-for="SubGroups.Name" class="text-danger"></span>
+                    </div>
+                    <hr />
+                    <div class="form-group form-switch">
+                        <input type="checkbox" asp-for="SubGroups.Notification" class="form-check-input" id="NotificationId" />&nbsp;
+                        <label asp-for="SubGroups.Notification">Bekræft at du er færdig</label>
+                        <span asp-validation-for="SubGroups.Notification" class="text-danger"></span>
+                    </div>
+                    <hr />
+                    <i>Når du aktivere gruppen sendes der automatisk mails ud og nogle af gruppens funktioner låses.</i>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning btn-primary" data-bs-save="modal" id="ActivateId" disabled>Aktiver & Send</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Luk</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    document.getElementById("NotificationId").onchange = function () { DeleteFunction() }
+
+    function DeleteFunction() {
+        var DeleteValue = document.getElementById("NotificationId").checked;
+
+        if (DeleteValue == true) {
+            document.getElementById("ActivateId").disabled = false;
+        } else {
+            document.getElementById("ActivateId").disabled = true;
+        }
+    }
+
+</script>

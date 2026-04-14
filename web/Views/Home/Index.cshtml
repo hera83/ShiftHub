@@ -1,0 +1,943 @@
+﻿@{
+    /// Title
+    ViewData["Title"] = "Overblik";
+
+    /// Messages
+    foreach (ShiftHub.Models.MessageModel.Message item in Model.Messages.aList)
+    {
+                                                                                                    <div class="alert alert-@item.Type.ToString().ToLower() d-flex align-items-center bs-popover-start" role="alert">
+                                                                                                        <table width="100%">
+                                                                                                            <tr>
+                                                                                                                <td align="left" valign="middle" style="font-size: 16px;">
+                                                                                                                    @switch (item.Type.ToString())
+                        {
+                            case "Info":
+                                                                                                                            <i class="bi bi-info-circle"></i>
+                                break;
+                            case "Success":
+                                                                                                                            <i class="bi bi-check-circle"></i>
+                                break;
+                            case "Warning":
+                                                                                                                            <i class="bi bi-exclamation-circle"></i>
+                                break;
+                            case "Danger":
+                                                                                                                            <i class="bi bi-exclamation-diamond"></i>
+                                break;
+                        }
+                                                                                                                    @item.Content
+                                                                                                                </td>
+                                                                                                                <td align="right" valign="middle">
+                                                                                                                    <button type="button" id="@item.UiD" class="btn-close" data-bs-dismiss="alert" title="Luk"></button>
+                                                                                                                </td>
+                                                                                                            </tr>
+                                                                                                        </table>
+                                                                                                    </div>
+    @if (item.Type.ToString() != "Danger")
+        {
+                                                                                                                        <script type="text/javascript">
+                                                                                                                            setTimeout(function () {
+                                                                                                                                document.getElementById('@item.UiD').click();
+                                                                                                                            }, @item.AutoClose);
+                                                                                                                        </script>
+        }
+    }
+}
+
+<div id="PopUpPlaceholder"></div>
+<div id="AlertPlaceholder"></div>
+
+<div>
+    <input type="hidden" id="SubGroupValue" />
+    <input type="hidden" id="DragSourceId" />
+    <input type="hidden" id="SmsValue" value="0" />
+    <input type="hidden" id="MuteValue" value="0" />
+    <input type="hidden" id="ListValue" value="0" />
+    <input type="hidden" id="UpdateValue" value="0" />
+
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col" align="left">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="planId" onclick="viewChange()">
+                <label class="form-check-label" for="planId">Udvid</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="viewOne" style="display: block;">
+        <br /><br />
+        <table width="100%">
+            <tr>
+                <td align="center", valign="top">
+                    <table width="80%">
+                        <tr>
+                            <td width="33%" style="height: 25vh;">
+                                <canvas id="myChart1"></canvas>
+                            </td>
+                            <td width="34%">
+                                <canvas id="myChart2"></canvas>
+                            </td>
+                            <td width="33%">
+                                <canvas id="myChart3"></canvas>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" align="center" valign="bottom" height="60px">
+                                <b>Tilmeldinger</b>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="height: 25vh;">
+                                <canvas id="myChart4"></canvas>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="container" id="viewTwo" style="display: none;">
+        <div class="row">
+            <div class="col-2">
+                <h5><i class="bi bi-bezier2"> Poster</i></h5>
+                <hr />
+                <table border="0" width="100%">
+                    <tr>
+                        <td align="center">
+                            <button type="button" class="btn lightButton groupFunction" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("SubPostCheckIn", "Home", new { })" title="CheckIn" disabled>
+                                <center><i class="bi bi-person-add" style="font-size: 1.2rem; color: gray;"></i></center>
+                            </button>
+                            <button type="button" class="btn lightButton groupFunction" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("SubPostCreatePost", "Home", new { })" title="Opret post" disabled>
+                                <center><i class="bi bi-patch-plus" style="font-size: 1.2rem; color: gray;"></i></center>
+                            </button>
+                            <button type="button" class="btn lightButton " onclick="sms()" title="Bruger advicering via sms" disabled>
+                                <center><i id="Sms" class="bi bi-phone-vibrate" style="font-size: 1.2rem; color: gray;"></i></center>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">
+                            <button type="button" class="btn lightButton groupFunction" onclick="mute()" title="Mute site" disabled>
+                                <center><i id="Mute" class="bi bi-volume-mute" style="font-size: 1.2rem; color: gray;"></i></center>
+                            </button>
+                            <button type="button" class="btn lightButton groupFunction" onclick="list()" title="Udvid alt" disabled>
+                                <center><i id="List" class="bi bi-layers" style="font-size: 1.2rem; color: gray;"></i></center>
+                            </button>
+                            <button type="button" class="btn lightButton groupFunction" onclick="update()" title="Automatisk opdatering" disabled>
+                                <center><i id="Update" class="bi bi-arrow-repeat" style="font-size: 1.2rem; color: gray;"></i></center>
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+                <hr />
+                <table border="0" width="100%">
+                    <tr>
+                        <td>
+                            <input type="text" class="form-control groupFunction" placeholder="Søg her" onchange="updateOverview()" onkeyup="updateOverview()" id="SearchId" disabled />
+                        </td>
+                    </tr>
+                </table>
+                <hr />
+                <table border="0" width="100%">
+                    <tr>
+                        <td>
+                            <div class="row">
+                                <div id="Alerts_View" class="col">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div id="Groups_0" class="col" ondrop="drop(event)" ondragover="allowDrop(event)" style="height: auto; padding-bottom: 15px;">
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                <hr />
+                <table border="0" width="100%">
+                    <tr>
+                        <td>
+                            <select class="form-control" onchange="updateSubGroup(this)" id="SubGroup">
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col my-1 m-1">
+                <div class="row">
+                    <div id="Groups_1" class="col" ondrop="drop(event)" ondragover="allowDrop(event)" style="border-right: 1px dashed lightgray; height: 78vh;">
+                    </div>
+                    <div id="Groups_2" class="col" ondrop="drop(event)" ondragover="allowDrop(event)" style="border-right: 1px dashed lightgray; height: 78vh;">
+                    </div>
+                    <div id="Groups_3" class="col" ondrop="drop(event)" ondragover="allowDrop(event)" style="border-right: 1px dashed lightgray; height: 78vh;">
+                    </div>
+                    <div id="Groups_4" class="col" ondrop="drop(event)" ondragover="allowDrop(event)" style="min-height: 78vh;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+<script type="text/javascript">
+    var jsonObj = JSON.parse('@Html.Raw($"{Model.JsonObj}")');
+    subGroupUpdate();
+
+    function viewChange() {
+        if (document.getElementById("planId").checked == true) {
+            document.getElementById("viewOne").style = "display: none;";
+            document.getElementById("viewTwo").style = "display: block;";
+        } else {
+            document.getElementById("viewOne").style = "display: block;";
+            document.getElementById("viewTwo").style = "display: none;";
+        }
+    }
+    function subGroupUpdate() {
+        document.getElementById("SubGroup").insertAdjacentHTML('beforeend', '<option value=\"\" selected=\"true\" disabled></option>');
+
+        for (let i = 0; i < jsonObj.SubGroups.length; i++) {
+            document.getElementById("SubGroup").insertAdjacentHTML('beforeend', '<option value=\"' + jsonObj.SubGroups[i].Id + '\">' + jsonObj.SubGroups[i].Name + '</option>');
+        }
+    }
+
+    /* Oversigt */
+    new Chart("myChart1", {
+        type: 'doughnut',
+        data: {
+            labels: ['Aktive', 'Pasive'],
+            datasets: [{
+                data: jsonObj.Arrangements,
+                backgroundColor: ['#aebfd1', '#e8e380'],
+            }]
+        },
+        options: {
+            legend: {
+                display: false
+            },
+            elements: {
+                center: {
+                    text: 'Opgaver',
+                    color: 'black',
+                    fontStyle: 'Helvetica',
+                    sidePadding: 15
+                }
+            }
+        }
+    });
+    new Chart("myChart2", {
+        type: 'doughnut',
+        data: {
+            labels: ['Registeret', 'Mangler'],
+            datasets: [{
+                data: jsonObj.Shifts,
+                backgroundColor: ['#aebfd1', '#e8e380'],
+            }]
+        },
+        options: {
+            legend: {
+                display: false
+            },
+            elements: {
+                center: {
+                    text: 'Vagter',
+                    color: 'black',
+                    fontStyle: 'Helvetica',
+                    sidePadding: 15
+                }
+            }
+        }
+    });
+    new Chart("myChart3", {
+        type: 'doughnut',
+        data: {
+            labels: ['Læst', 'Ulæste'],
+            datasets: [{
+                data: jsonObj.Messages,
+                backgroundColor: ['#aebfd1', '#e8e380'],
+            }]
+        },
+        options: {
+            legend: {
+                display: false
+            },
+            elements: {
+                center: {
+                    text: 'Beskeder',
+                    color: 'black',
+                    fontStyle: 'Helvetica',
+                    sidePadding: 15
+                }
+            }
+        }
+    });
+    new Chart("myChart4", {
+        type: 'bar',
+        data: {
+            labels: jsonObj.Registrations.WeekDay,
+            datasets: [{
+                data: jsonObj.Registrations.Count,
+                backgroundColor: '#aebfd1',
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            legend: {
+                display: false
+            },
+            responsive: true,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true,
+                        stepSize: 1
+                    }
+                }]
+            }
+        }
+    });
+    
+    Chart.pluginService.register({
+        beforeDraw: function (chart) {
+            if (chart.config.options.elements.center) {
+                //Get ctx from string
+                var ctx = chart.chart.ctx;
+
+                //Get options from the center object in options
+                var centerConfig = chart.config.options.elements.center;
+                var fontStyle = centerConfig.fontStyle || 'Arial';
+                var txt = centerConfig.text;
+                var color = centerConfig.color || '#000';
+                var sidePadding = centerConfig.sidePadding || 20;
+                var sidePaddingCalculated = (sidePadding / 100) * (chart.innerRadius * 2)
+                //Start with a base font of 30px
+                ctx.font = "30px " + fontStyle;
+
+                //Get the width of the string and also the width of the element minus 10 to give it 5px side padding
+                var stringWidth = ctx.measureText(txt).width;
+                var elementWidth = (chart.innerRadius * 2) - sidePaddingCalculated;
+
+                // Find out how much the font can grow in width.
+                var widthRatio = elementWidth / stringWidth;
+                var newFontSize = Math.floor(30 * widthRatio);
+                var elementHeight = (chart.innerRadius * 2);
+
+                // Pick a new font size so it will not be larger than the height of label.
+                var fontSizeToUse = Math.min(newFontSize, elementHeight);
+
+                //Set font settings to draw it correctly.
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                var centerX = ((chart.chartArea.left + chart.chartArea.right) / 2);
+                var centerY = ((chart.chartArea.top + chart.chartArea.bottom) / 2);
+                ctx.font = fontSizeToUse + "px " + fontStyle;
+                ctx.fillStyle = color;
+
+                //Draw text in center
+                ctx.fillText(txt, centerX, centerY);
+            }
+        }
+    });
+
+    /* Udvidet */
+    function updateSubGroup(element) {
+        // Set SubGroup
+        document.getElementById("SubGroupValue").value = element.value;
+
+        // CleenUp Intercace
+        document.getElementById("Groups_0").innerHTML = '';
+        document.getElementById("Groups_1").innerHTML = '';
+        document.getElementById("Groups_2").innerHTML = '';
+        document.getElementById("Groups_3").innerHTML = '';
+        document.getElementById("Groups_4").innerHTML = '';
+        document.getElementById("SmsValue").value = '1'; sms();
+        document.getElementById("MuteValue").value = '1'; mute();
+        document.getElementById("ListValue").value = '1'; list();
+        document.getElementById("UpdateValue").value = '1'; update();
+
+        // Update with new values
+        var functionButtons = document.getElementsByClassName("groupFunction");
+
+        if (element.value != '') {
+            updateOverview();
+
+            // Aktiver knapper
+            for (let i = 0; i < functionButtons.length; i++) {
+                functionButtons[i].disabled = false;
+            }
+        } else {
+            // Deaktiver knapper
+            for (let i = 0; i < functionButtons.length; i++) {
+                functionButtons[i].disabled = true;
+            }
+        }
+    }
+    function updateOverview() {
+        var PlaceHolderElement = $('#PopUpPlaceholder');
+        var subGroupId = document.getElementById("SubGroupValue").value;
+        var searchValue = document.getElementById("SearchId").value;
+
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_SubPostUpdate",
+            data: { SubGroupId: subGroupId, SearchValue: searchValue }
+        }).done(function (returned) {
+            dataObj = JSON.parse(returned);
+
+            // Show items if search
+            if (searchId != '') {
+                document.getElementById("ListValue").value = 0;
+                list();
+            }
+
+            // CleenUp Intercace
+            document.getElementById("Groups_0").innerHTML = '';
+            document.getElementById("Groups_1").innerHTML = '';
+            document.getElementById("Groups_2").innerHTML = '';
+            document.getElementById("Groups_3").innerHTML = '';
+            document.getElementById("Groups_4").innerHTML = '';
+
+            // Set Posts
+            for (let i = 0; i < dataObj.Posts.length; i++) {
+                var postEmpty = '';
+                if (dataObj.Posts[i].StaffCount > 0) {
+                    postEmpty = 'disabled';
+                }
+
+                var element = '<table id=\"Group_' + dataObj.Posts[i].Id + '\" width=\"100%\" draggable=\"true\" ondragstart=\"drag(event)\">' +
+                        '<tr>' +
+                            '<td align=\"left\" valign=\"middle\">' +
+                                '<table width=\"100%\">' +
+                                    '<tr>' +
+                                        '<td align=\"left\">' +
+                                            '<button class=\"btn light\" type=\"button\" data-bs-toggle=\"collapse\" data-bs-target=\"#Staffs_' + dataObj.Posts[i].Id + '\" aria-expanded=\"false\" aria-controls=\"StaffGroup_' + dataObj.Posts[i].Id + '\" style=\"width: 100%; text-align: left; border: 1px solid lightgray;\" id=\"PostName_' + dataObj.Posts[i].Id + '\" title=\"Antal staff på denne post: ' + dataObj.Posts[i].StaffCount + '\">' +
+                                                '<div class=\"row\">' +
+                                                    '<div class=\"col\" align=\"left\" id=\"PostNameValue_' + dataObj.Posts[i].Id + '\">' +
+                                                        '<b>' + dataObj.Posts[i].Name + '</b>' +
+                                                    '</div>' +
+                                                    '<div class=\"col\" align=\"right\">' +
+                                                        '<span class=\"badge bg-danger\" id=\"AlertCount_' + dataObj.Posts[i].Id + '\"></span>' +
+                                                    '</div>' +
+                                                '</div>' +
+                                            '</button>' +
+                                        '</td>' +
+                                        '<td align=\"right\" width=\"10px\">' +
+                                            '<input type=\"hidden\" id=\"GroupName_' + dataObj.Posts[i].Id + '\" value=\"' + dataObj.Posts[i].Name + '\" />' +
+                                            '<input type=\"hidden\" id=\"MaxTime_' + dataObj.Posts[i].Id + '\" value=\"' + dataObj.Posts[i].MaxTime + '\" />' +
+                                            '<ul class=\"navbar-nav flex-grow-1\">' +
+                                                '<li class=\"nav-item dropdown\">' +
+                                                    '<a class=\"nav-link nav-custom-dropdown\" href=\"#\" id=\"navbarDropdown\" role=\"button\" data-bs-toggle=\"dropdown\" aria-expanded=\"false\">' +
+                                                        '<i class=\"bi bi-three-dots-vertical\" style=\"width: 100%; text-align: left;\" style=\"font-size: 1rem; color: gray;\"></i>' +
+                                                    '</a>' +
+                                                    '<ul class=\"dropdown-menu\" aria-labelledby=\"navbarDropdown\">' +
+                                                        '<li>' +
+                                                            '<button type=\"button\" class=\"btn lightButton\" data-bs-toggle=\"postGroup-ajax-modal\" data-bs-url=\"/Home/SubPostEditPost?Id=' + dataObj.Posts[i].Id + '\" style=\"width: 100%; text-align: left;\" title=\"Rediger post\">' +
+                                                                '<i class=\"bi bi-pencil\" style=\"font-size: 1rem; color: gray;\">&nbsp;&nbsp;Rediger</i>' +
+                                                            '</button>' +
+                                                        '</li>' +
+                                                        '<li>' +
+                                                            '<button type=\"button\" class=\"btn lightButton\" data-bs-toggle=\"postGroup-ajax-modal\" data-bs-url=\"/Home/SubPostDeletePost?Id=' + dataObj.Posts[i].Id + '\" style=\"width: 100%; text-align: left;\" title=\"Fjern post\" ' + postEmpty + '>' +
+                                                                '<i class=\"bi bi-trash2\" style=\"font-size: 1rem; color: gray;\">&nbsp;&nbsp;Slet</i>' +
+                                                            '</button>' +
+                                                        '</li>' +
+                                                    '</ul>' +
+                                                '</li>' +
+                                            '</ul>' +
+                                        '</td>' +
+                                    '</tr>' +
+                                '</table>' +
+                            '</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                            '<td>' +
+                                '<div class=\"collapse StaffGroup\" id=\"Staffs_' + dataObj.Posts[i].Id + '\" ondragover=\"allowDrop(event)\" style=\"border: 1px solid lightgray; border-radius: 5px; padding-bottom: 30px;\">' +
+                                '</div>' +
+                            '</td>' +
+                        '</tr>' +
+                    '</table>';
+
+                document.getElementById("Groups_" + dataObj.Posts[i].Group).insertAdjacentHTML('beforeend', element);
+            }
+
+            // Set Staff
+            for (let i = 0; i < dataObj.Staff.length; i++) {
+                // Set Alert Counter
+                let AlertCount = document.getElementById("AlertCount_" + dataObj.Staff[i].PostId).innerHTML;
+                if (!AlertCount) {
+                    AlertCount = 0;
+                }
+
+                // Set Alert Message
+                let MaxTime = document.getElementById("MaxTime_" + dataObj.Staff[i].PostId).value;
+                let Minutes = dataObj.Staff[i].Minutes;
+                var AlertColor = 'green';
+                var AlertNote = 'Brugeren er ok';
+                var AlertMute = '';
+                
+                if (MaxTime != 0 && Minutes >= MaxTime) {
+                    AlertCount++;
+                    AlertColor = 'red';
+                    AlertNote = 'Brugeren har været der længere tid end ønsket!';
+                    AlertMute = 'show';
+                    //GenerateAlert('danger', 'Det er tid til at <u>' + dataObj.Staff[i].FirstName + '</u> skal skifte post (' + document.getElementById("GroupName_" + dataObj.Staff[i].PostId).value + ') (' + document.getElementById("MaxTime_" + dataObj.Staff[i].PostId).value + ' Min)', 30);
+                }
+
+                // Set Alert Tasks
+                if (AlertCount > 0) {
+                    // Update Alert Counter
+                    document.getElementById("AlertCount_" + dataObj.Staff[i].PostId).innerHTML = AlertCount;
+
+                    // Show Group Staff
+                    if (document.getElementById("Staffs_" + dataObj.Staff[i].PostId).classList.contains("show") == false) {
+                        document.getElementById("Staffs_" + dataObj.Staff[i].PostId).classList.add("show");
+                    }
+                }
+                
+                // Generate Element
+                var element = '<table id=\"Staff_' + dataObj.Staff[i].StaffId + '\" width=\"90%\" draggable=\"true\" ondragstart=\"drag(event)\" style=\"margin: 0px 5% 0px 5%;\">' +
+                        '<tr>' +
+                            '<td align=\"left\">' +
+                                '<i class=\"bi bi-person-check\" id=\"StafffViewStatus_' + dataObj.Staff[i].StaffId + '\" style=\"font-size: 1.2rem; color: ' + AlertColor + '; cursor: help;\" title=\"' + AlertNote + '\"></i>&nbsp;&nbsp;' +
+                                '<i style=\"font-size: 14px; cursor: help;\" id=\"StaffViewName_' + dataObj.Staff[i].StaffId + '\" title=\"Navn: ' + dataObj.Staff[i].Name + '&#013;CheckIn: ' + dataObj.Staff[i].CheckIn + ' (' + dataObj.Staff[i].Minutes + ' Min)\">' + dataObj.Staff[i].Name + '</i>' +
+                            '</td>' +
+                            '<td align=\"right\" width=\"10px\">' +
+                                '<ul class=\"navbar-nav flex-grow-1\">' +
+                                    '<li class=\"nav-item dropdown\">' +
+                                        '<a class=\"nav-link nav-custom-dropdown\" href=\"#\" id=\"navbarDropdown\" role=\"button\" data-bs-toggle=\"dropdown\" aria-expanded=\"false\">' +
+                                            '<i class=\"bi bi-three-dots-vertical\" style=\"width: 100%; text-align: left;\" style=\"font-size: 1rem; color: gray;\" id=\"StaffStatus_' + dataObj.Staff[i].StaffId + '\"></i>' +
+                                        '</a>' +
+                                        '<ul class=\"dropdown-menu\" aria-labelledby=\"navbarDropdown\">' +
+                                            '<li class=\"collapse ' + AlertMute + '\" id=\"StaffAlarmItem_' + dataObj.Staff[i].StaffId + '\">' +
+                                                '<input type=\"hidden\" id=\"StaffAlarmValue_' + dataObj.Staff[i].StaffId + '\" value=\"0\" />' +
+                                                '<input type=\"hidden\" id=\"StaffAvtiveGroup_' + dataObj.Staff[i].StaffId + '\" value=\"' + dataObj.Staff[i].PostId + '\" />' +
+                                                '<button type=\"button\" class=\"btn lightButton\" onclick=\"muteStaff(' + dataObj.Staff[i].StaffId + ')\" style=\"width: 100%; text-align: left;\" title=\"Sluk alarm\">' +
+                                                    '<i class=\"bi bi-volume-mute\" id=\"StaffAlarmIcon_' + dataObj.Staff[i].StaffId + '\" style=\"font-size: 1rem; color: gray;\">&nbsp;&nbsp;Sluk alarm</i>' +
+                                                '</button>' +
+                                            '</li>';
+
+                                            if (dataObj.Staff[i].Group != '0') {
+                                                element += '<li class=\"\" id=\"MoveTo_' + dataObj.Staff[i].StaffId + '\">' +
+                                                    '<a class=\"btn lightButton\" href=\"#\" style=\"width: 100%; text-align: left;\" title=\"Flyt post\">' +
+                                                        '<i class="bi bi-arrow-left-right" style=\"font-size: 1rem; color: gray;\">&nbsp;&nbsp;Flyt til</i>' +
+                                                    '</a>' +
+                                                    '<ul class=\"dropdown-menu dropdown-submenu\" id=\"MoveToElements_' + dataObj.Staff[i].StaffId + '\">';
+                                                        for (let x = 0; x < dataObj.MoveTo.length; x++) {
+                                                            element += '<li>' +
+                                                                '<button type=\"button\" class=\"btn lightButton\" onclick=\"moveTo(' + dataObj.Staff[i].PostId + ',' + dataObj.MoveTo[x].PostId + ',' + dataObj.Staff[i].StaffId + ')\" style=\"width: 100%; text-align: left;\" title=\"Flyt her til\">' +
+                                                                    '<b>' + dataObj.MoveTo[x].GroupName + '</b>' +
+                                                                '</button>' +
+                                                            '</li>';
+                                                        }
+                                                    element += '</ul>' +
+                                                '</li>'
+                                            } else {
+                                                element += '<li class=\"MoveToHide\" id=\"MoveTo_' + dataObj.Staff[i].StaffId + '\"></li>';
+                                            }
+
+                                            element += '<li>' +
+                                                '<button type=\"button\" class=\"btn lightButton\" data-bs-toggle=\"postGroup-ajax-modal\" data-bs-url=\"/Home/SubPostCheckOut?StaffId=' + dataObj.Staff[i].StaffId + '\" style=\"width: 100%; text-align: left;\" title=\"CheckOut\">' +
+                                                    '<i class=\"bi bi-box-arrow-right\" style=\"font-size: 1rem; color: gray;\">&nbsp;&nbsp;CheckOut</i>' +
+                                                '</button>' +
+                                            '</li>' +
+                                        '</ul>' +
+                                    '</li>' +
+                                '</ul>' +
+                            '</td>' +
+                        '</tr>' +
+                    '</table>';
+                
+                // Set Element
+                document.getElementById("Staffs_" + dataObj.Staff[i].PostId).insertAdjacentHTML('beforeend', element);
+            }
+            
+            // Set Missing Staff
+            if (dataObj.Alerts.length > 0) {
+                var element = '<table width=\"100%\">' +
+                    '<tr>' +
+                        '<td>' +
+                            '<button class=\"btn light\" type=\"button\" data-bs-toggle=\"collapse\" data-bs-target=\"#Alerts_Staff\" aria-expanded=\"false\" aria-controls=\"Alerts_Staff\" style=\"width: 100%; text-align: left; border: 1px solid lightgray;\" title=\"Bruger som ikke er mødt op til sin vagt\">' +
+                                '<div class=\"row\">' +
+                                    '<div class=\"col\" align=\"left\">' +
+                                        '<b>Advarsler</b>' +
+                                    '</div>' +
+                                    '<div class=\"col\" align=\"right\">' +
+                                        '<span class=\"badge bg-danger\">' + dataObj.Alerts.length + '</span>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</button>' +
+                        '</td>' +
+                    '</tr>' +
+                    '<tr>' +
+                        '<td>' +
+                            '<div class=\"collapse\" id=\"Alerts_Staff\" style=\"border: 1px solid lightgray; border-radius: 5px;\">';
+
+                            for (let i = 0; i < dataObj.Alerts.length; i++) {
+                                element  += '<div>' +
+                                    '<button type=\"button\" class=\"btn lightButton\" data-bs-toggle=\"alert-ajax-modal\" data-bs-url=\"/Home/AlertView?ShiftId=' + dataObj.Alerts[i].ShiftId + '&StaffId=' + dataObj.Alerts[i].StaffId + '\" style=\"width: 100%; text-align: left;\" title=\"Se detaljer\">' +
+                                        '<i class=\"bi bi-person-exclamation\" style=\"font-size: 1.2rem; color: red;\"></i>&nbsp;&nbsp;' +
+                                        dataObj.Alerts[i].Name +
+                                    '</button>' +
+                                '</div>';
+                            }
+
+                            element += '</div>' +
+                        '</td>' +
+                    '</tr>' +
+                '</table>';
+
+                document.getElementById('Alerts_View').insertAdjacentHTML('beforeend', element);
+
+                // Aktiver knapper
+                $('button[data-bs-toggle="alert-ajax-modal"]').click(function (event) {
+                    var url = $(this).data('bs-url');
+                    $.get(url).done(function (data) {
+                        PlaceHolderElement.html(data);
+                        PlaceHolderElement.find('.modal').modal('show');
+                    })
+                });
+            } else {
+                document.getElementById('Alerts_View').innerHTML = '';
+            }
+
+            // Aktiver knapper
+            $('button[data-bs-toggle="postGroup-ajax-modal"]').click(function (event) {
+                var url = $(this).data('bs-url');
+                $.get(url).done(function (data) {
+                    PlaceHolderElement.html(data);
+                    PlaceHolderElement.find('.modal').modal('show');
+                })
+            })
+        });
+    }
+    function moveTo(fromPostId, toPostId, staffId) {
+        var subGroupId = document.getElementById("SubGroupValue").value;
+        
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_SubPostStaffSwop",
+            data: { SubGroupId: subGroupId, PostId: toPostId, StaffId: staffId }
+        }).done(function (returned) {
+            // CleenUp Element
+            document.getElementById('MoveTo_' + staffId).innerHTML = '';
+            document.getElementById('MoveTo_' + staffId).classList.add('MoveToHide');
+
+            // Get Element
+            const elementToMove = document.getElementById('Staff_' + staffId);
+
+            // Move Element
+            document.getElementById('Staffs_' + toPostId).insertAdjacentElement('beforeend', elementToMove);
+
+            // Update Site
+            updateStaffs('once');
+        });
+    }
+
+    function allowDrop(ev) {
+        const SourceId = document.getElementById("DragSourceId").value;
+        const TargegId = ev.target.id;
+        const regExGroups = new RegExp('^Group');
+        const regExUsers = new RegExp('^Staff');
+
+        if (regExGroups.test(SourceId) == true && regExGroups.test(TargegId) == true) {
+            ev.preventDefault();
+        } else if (regExUsers.test(SourceId) == true && regExUsers.test(TargegId) == true) {
+            ev.preventDefault();
+        }
+    }
+    function drag(ev) {
+        ev.dataTransfer.setData("text", ev.target.id);
+        document.getElementById("DragSourceId").value = ev.dataTransfer.getData("text");
+    }
+    function drop(ev) {
+        var subGroupId = document.getElementById("SubGroupValue").value;
+
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        ev.target.appendChild(document.getElementById(data));
+
+        // Save State
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_SubPostChangePosision",
+            data: { SubGroupId: subGroupId, Group: data, Target: ev.target.id }
+        }).done(function (returned) {
+            updateStaffs('once');
+        });
+    }
+    
+    function sms() {
+        if (document.getElementById("SmsValue").value == "0") {
+            document.getElementById("Sms").classList.remove("bi-phone-vibrate");
+            document.getElementById("Sms").classList.add("bi-phone-vibrate-fill");
+
+            document.getElementById("SmsValue").value = "1";
+        } else {
+            document.getElementById("Sms").classList.remove("bi-phone-vibrate-fill");
+            document.getElementById("Sms").classList.add("bi-phone-vibrate");
+
+            document.getElementById("SmsValue").value = "0";
+        }
+    }
+    function mute() {
+        if (document.getElementById("MuteValue").value == "0") {
+            document.getElementById("Mute").classList.remove("bi-volume-mute");
+            document.getElementById("Mute").classList.add("bi-volume-mute-fill");
+
+            document.getElementById("MuteValue").value = "1";
+        } else {
+            document.getElementById("Mute").classList.remove("bi-volume-mute-fill");
+            document.getElementById("Mute").classList.add("bi-volume-mute");
+
+            document.getElementById("MuteValue").value = "0";
+        }
+    }
+    function list() {
+        var StaffGroups = document.getElementsByClassName("StaffGroup");
+
+        if (document.getElementById("ListValue").value == "0") {
+            for (let i = 0; i < StaffGroups.length; i++) {
+                StaffGroups[i].classList.add("show");
+            }
+
+            document.getElementById("List").classList.remove("bi-layers");
+            document.getElementById("List").classList.add("bi-layers-fill");
+
+            document.getElementById("ListValue").value = "1";
+        } else {
+            for (let i = 0; i < StaffGroups.length; i++) {
+                StaffGroups[i].classList.remove("show");
+            }
+
+            document.getElementById("List").classList.remove("bi-layers-fill");
+            document.getElementById("List").classList.add("bi-layers");
+
+            document.getElementById("ListValue").value = "0";
+        }
+    }
+    function update() {
+        if (document.getElementById("UpdateValue").value == "0") {
+            document.getElementById("Update").classList.remove("bi-arrow-repeat");
+            document.getElementById("Update").classList.add("bi-stop-circle-fill");
+
+            document.getElementById("UpdateValue").value = "1";
+
+            updateStaffs();
+        } else {
+            document.getElementById("Update").classList.remove("bi-stop-circle-fill");
+            document.getElementById("Update").classList.add("bi-arrow-repeat");
+
+            document.getElementById("UpdateValue").value = "0";
+        }
+    }
+    function muteStaff(staffId) {
+        var StaffAlertValue = document.getElementById("StaffAlarmValue_" + staffId).value;
+
+        if (StaffAlertValue == 0) {
+            document.getElementById("StaffAlarmValue_" + staffId).value = '1';
+            document.getElementById("StaffAlarmIcon_" + staffId).classList.remove("bi-volume-mute");
+            document.getElementById("StaffAlarmIcon_" + staffId).classList.add("bi-volume-mute-fill");
+        } else {
+            document.getElementById("StaffAlarmValue_" + staffId).value = '0';
+            document.getElementById("StaffAlarmIcon_" + staffId).classList.remove("bi-volume-mute-fill");
+            document.getElementById("StaffAlarmIcon_" + staffId).classList.add("bi-volume-mute");
+        }
+
+        updateStaffs('once')
+    }
+
+    function updateStaffs(runs) {
+        var subGroupId = document.getElementById("SubGroupValue").value;
+        if (!runs) {
+            runs = 'loop';
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_SubPostUpdate",
+            data: { SubGroupId: subGroupId }
+        }).done(function (returned) {
+            dataObj = JSON.parse(returned);
+            let TotalAlerts = 0;
+
+            // Reset Alerts
+            document.getElementById("AlertPlaceholder").innerHTML = '';
+
+            // Handel Posts List
+            for (let i = 0; i < dataObj.Posts.length; i++) {
+                document.getElementById('PostName_' + dataObj.Posts[i].Id).title = 'Antal staff på denne post: ' + dataObj.Posts[i].StaffCount;
+                document.getElementById('MaxTime_' + dataObj.Posts[i].Id).value = dataObj.Posts[i].MaxTime;
+                document.getElementById("AlertCount_" + dataObj.Posts[i].Id).innerHTML = '';
+            }
+
+            // Handel Staff List
+            for (let i = 0; i < dataObj.Staff.length; i++) {
+                // Check Active Group
+                if (document.getElementById('StaffAvtiveGroup_' + dataObj.Staff[i].StaffId).value != dataObj.Staff[i].PostId) {
+                    document.getElementById('Staffs_' + dataObj.Staff[i].PostId).insertAdjacentElement('beforeend', document.getElementById('Staff_' + dataObj.Staff[i].StaffId));
+                    document.getElementById('StaffAvtiveGroup_' + dataObj.Staff[i].StaffId).value = dataObj.Staff[i].PostId;
+                }
+
+                // Set Alert Counter
+                let AlertCount = document.getElementById("AlertCount_" + dataObj.Staff[i].PostId).innerHTML;
+                if (!AlertCount) {
+                    AlertCount = 0;
+                }
+
+                // Get Alert Data
+                let MaxTime = document.getElementById("MaxTime_" + dataObj.Staff[i].PostId).value;
+                let Minutes = dataObj.Staff[i].Minutes;
+                var AlertColor = 'green';
+                var AlertNote = 'Brugeren er ok';
+                var StaffAlertValue = document.getElementById("StaffAlarmValue_" + dataObj.Staff[i].StaffId).value;
+                
+                if (MaxTime != 0 && Minutes >= MaxTime && StaffAlertValue == 0) {
+                    AlertCount++;
+                    TotalAlerts++;
+                    AlertColor = 'red';
+                    AlertNote = 'Brugeren har været der længere tid end ønsket!';
+
+                    if (document.getElementById("StaffAlarmItem_" + dataObj.Staff[i].StaffId).classList.contains("show") == false) {
+                        document.getElementById("StaffAlarmItem_" + dataObj.Staff[i].StaffId).classList.add("show");
+                    }
+                } else if (MaxTime == 0 || Minutes < MaxTime) {
+                    if (document.getElementById("StaffAlarmItem_" + dataObj.Staff[i].StaffId).classList.contains("show") == true) {
+                        if (StaffAlertValue == 1) {
+                            document.getElementById("StaffAlarmValue_" + dataObj.Staff[i].StaffId).value = '0';
+                            document.getElementById("StaffAlarmIcon_" + dataObj.Staff[i].StaffId).classList.remove("bi-volume-mute-fill");
+                            document.getElementById("StaffAlarmIcon_" + dataObj.Staff[i].StaffId).classList.add("bi-volume-mute");
+                        }
+
+                        document.getElementById("StaffAlarmItem_" + dataObj.Staff[i].StaffId).classList.remove("show");
+                    }
+                }
+
+                // Set MoveTo
+                if (dataObj.Staff[i].Group == '0') {
+                    if (document.getElementById('MoveTo_' + dataObj.Staff[i].StaffId).classList.contains("MoveToHide") == false) {
+                        document.getElementById('MoveTo_' + dataObj.Staff[i].StaffId).innerHTML = '';
+                        document.getElementById('MoveTo_' + dataObj.Staff[i].StaffId).classList.add('MoveToHide');
+                    }
+                } else {
+                    if (document.getElementById('MoveTo_' + dataObj.Staff[i].StaffId).classList.contains("MoveToHide") == true) {
+                        document.getElementById('MoveTo_' + dataObj.Staff[i].StaffId).innerHTML =
+                        '<a class=\"btn lightButton\" href=\"#\" style=\"width: 100%; text-align: left;\" title=\"Flyt post\">' +
+                            '<i class="bi bi-arrow-left-right" style=\"font-size: 1rem; color: gray;\">&nbsp;&nbsp;Flyt til</i>' +
+                        '</a>' +
+                        '<ul class=\"dropdown-menu dropdown-submenu\" id=\"MoveToElements_' + dataObj.Staff[i].StaffId + '\">' +
+                        '</ul>';
+
+                        document.getElementById('MoveTo_' + dataObj.Staff[i].StaffId).classList.remove('MoveToHide');
+                    } else {
+                        document.getElementById('MoveToElements_' + dataObj.Staff[i].StaffId).innerHTML = '';
+                    }
+
+                    var element = '';
+
+                    for (let x = 0; x < dataObj.MoveTo.length; x++) {
+                        element += '<li>' +
+                            '<button type=\"button\" class=\"btn lightButton\" onclick=\"moveTo(' + dataObj.Staff[i].PostId + ',' + dataObj.MoveTo[x].PostId + ',' + dataObj.Staff[i].StaffId + ')\" style=\"width: 100%; text-align: left;\" title=\"Flyt her til\">' +
+                                '<b>' + dataObj.MoveTo[x].GroupName + '</b>' +
+                            '</button>' +
+                        '</li>';
+                    }
+
+                    document.getElementById('MoveToElements_' + dataObj.Staff[i].StaffId).insertAdjacentHTML('beforeend', element);
+                }
+
+                // Set Staff
+                document.getElementById("StafffViewStatus_" + dataObj.Staff[i].StaffId).style.color = AlertColor;
+                document.getElementById("StafffViewStatus_" + dataObj.Staff[i].StaffId).title = AlertNote;
+                document.getElementById("StaffViewName_" + dataObj.Staff[i].StaffId).title = 'Navn: ' + dataObj.Staff[i].Name + '\r\nCheckIn: ' + dataObj.Staff[i].CheckIn + ' (' + dataObj.Staff[i].Minutes + ' Min)';
+
+                // Set Alert Tasks
+                if (AlertCount > 0) {
+                    // Update Alert Counter
+                    document.getElementById("AlertCount_" + dataObj.Staff[i].PostId).innerHTML = AlertCount;
+                }
+            }
+
+            // Handel Missing Staff
+            if (dataObj.Alerts.length > 0) {
+                var element = '<table width=\"100%\">' +
+                    '<tr>' +
+                        '<td>' +
+                            '<button class=\"btn light\" type=\"button\" data-bs-toggle=\"collapse\" data-bs-target=\"#Alerts_Staff\" aria-expanded=\"false\" aria-controls=\"Alerts_Staff\" style=\"width: 100%; text-align: left; border: 1px solid lightgray;\" title=\"Bruger som ikke er mødt op til sin vagt\">' +
+                                '<div class=\"row\">' +
+                                    '<div class=\"col\" align=\"left\">' +
+                                        '<b>Advarsler</b>' +
+                                    '</div>' +
+                                    '<div class=\"col\" align=\"right\">' +
+                                        '<span class=\"badge bg-danger\">' + dataObj.Alerts.length + '</span>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</button>' +
+                        '</td>' +
+                    '</tr>' +
+                    '<tr>' +
+                        '<td>' +
+                            '<div class=\"collapse'; if (document.getElementById('Alerts_Staff') && document.getElementById('Alerts_Staff').classList.contains('show') == true) { element += ' show'; } element += '\" id=\"Alerts_Staff\" style=\"border: 1px solid lightgray; border-radius: 5px;\">';
+
+                            for (let i = 0; i < dataObj.Alerts.length; i++) {
+                                element  += '<div>' +
+                                    '<button type=\"button\" class=\"btn lightButton\" data-bs-toggle=\"alert-ajax-modal\" data-bs-url=\"/Home/AlertView?ShiftId=' + dataObj.Alerts[i].ShiftId + '&StaffId=' + dataObj.Alerts[i].StaffId + '\" style=\"width: 100%; text-align: left;\" title=\"Se detaljer\">' +
+                                        '<i class=\"bi bi-person-exclamation\" style=\"font-size: 1.2rem; color: red;\"></i>&nbsp;&nbsp;' +
+                                        dataObj.Alerts[i].FirstName +
+                                    '</button>' +
+                                '</div>';
+                            }
+
+                            element += '</div>' +
+                        '</td>' +
+                    '</tr>' +
+                '</table>';
+
+                document.getElementById('Alerts_View').innerHTML = '';
+                document.getElementById('Alerts_View').insertAdjacentHTML('beforeend', element);
+
+                // Aktiver knapper
+                var PlaceHolderElement = $('#PopUpPlaceholder');
+
+                $('button[data-bs-toggle="alert-ajax-modal"]').click(function (event) {
+                    var url = $(this).data('bs-url');
+                    $.get(url).done(function (data) {
+                        PlaceHolderElement.html(data);
+                        PlaceHolderElement.find('.modal').modal('show');
+                    })
+                });
+            } else {
+                document.getElementById('Alerts_View').innerHTML = '';
+            }
+
+            // Sound Alert
+            if (TotalAlerts > 0) {
+                beep();
+            }
+
+            // Delay function
+            if (document.getElementById("UpdateValue").value == "1" && runs == 'loop') {
+                setTimeout(updateStaffs, 3000);
+            }
+        });
+    }
+
+    function GenerateAlert(type, message, timeout) {
+        // Generate Alert Html
+        var element = '<div class=\"alert alert-warning alert-dismissible fade show\" role=\"alert\">' +
+                message +
+                '<button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button>' +
+            '</div>';
+        
+        document.getElementById('AlertPlaceholder').insertAdjacentHTML('beforeend', element);
+
+        beep();
+    }
+    function beep() {
+        if (document.getElementById("MuteValue").value == "0") {
+            var snd = new Audio("data:audio/wav;base64,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qJrx4KOQjahZxWbcZgztj2c49nKmkId44S71j0c8eV9yDK6uPRzx5X18eDvjvQ6yKo9ZSS6l//8elePK/Lf//IInrOF/FvDoADYAGBMGb7FtErm5MXMlmPAJQVgWta7Zx2go+8xJ0UiCb8LHHdftWyLJE0QIAIsI+UbXu67dZMjmgDGCGl1H+vpF4NSDckSIkk7Vd+sxEhBQMRU8j/12UIRhzSaUdQ+rQU5kGeFxm+hb1oh6pWWmv3uvmReDl0UnvtapVaIzo1jZbf/pD6ElLqSX+rUmOQNpJFa/r+sa4e/pBlAABoAAAAA3CUgShLdGIxsY7AUABPRrgCABdDuQ5GC7DqPQCgbbJUAoRSUj+NIEig0YfyWUho1VBBBA//uQZB4ABZx5zfMakeAAAAmwAAAAF5F3P0w9GtAAACfAAAAAwLhMDmAYWMgVEG1U0FIGCBgXBXAtfMH10000EEEEEECUBYln03TTTdNBDZopopYvrTTdNa325mImNg3TTPV9q3pmY0xoO6bv3r00y+IDGid/9aaaZTGMuj9mpu9Mpio1dXrr5HERTZSmqU36A3CumzN/9Robv/Xx4v9ijkSRSNLQhAWumap82WRSBUqXStV/YcS+XVLnSS+WLDroqArFkMEsAS+eWmrUzrO0oEmE40RlMZ5+ODIkAyKAGUwZ3mVKmcamcJnMW26MRPgUw6j+LkhyHGVGYjSUUKNpuJUQoOIAyDvEyG8S5yfK6dhZc0Tx1KI/gviKL6qvvFs1+bWtaz58uUNnryq6kt5RzOCkPWlVqVX2a/EEBUdU1KrXLf40GoiiFXK///qpoiDXrOgqDR38JB0bw7SoL+ZB9o1RCkQjQ2CBYZKd/+VJxZRRZlqSkKiws0WFxUyCwsKiMy7hUVFhIaCrNQsKkTIsLivwKKigsj8XYlwt/WKi2N4d//uQRCSAAjURNIHpMZBGYiaQPSYyAAABLAAAAAAAACWAAAAApUF/Mg+0aohSIRobBAsMlO//Kk4soosy1JSFRYWaLC4qZBYWFRGZdwqKiwkNBVmoWFSJkWFxX4FFRQWR+LsS4W/rFRb/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////VEFHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAU291bmRib3kuZGUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMjAwNGh0dHA6Ly93d3cuc291bmRib3kuZGUAAAAAAAAAACU=");
+            snd.volume = 1.0;
+            snd.play();
+        }
+    }
+
+</script>

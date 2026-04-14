@@ -1,0 +1,23 @@
+services:
+  shifthub:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data/App_Data:/app/App_Data
+      - ./data/Logs:/app/Logs
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: "Data Source=App_Data/shifthub.db"
+      MailConfig__Server_Smtp: ${MAIL_SMTP_SERVER:-send.one.com}
+      MailConfig__Port_Smtp: ${MAIL_SMTP_PORT:-587}
+      MailConfig__Server_Imap: ${MAIL_IMAP_SERVER:-imap.one.com}
+      MailConfig__Port_Imap: ${MAIL_IMAP_PORT:-993}
+      MailConfig__Username: ${MAIL_USERNAME}
+      MailConfig__Password: ${MAIL_PASSWORD}
+      MailConfig__Mail: ${MAIL_ADDRESS}
+      MailConfig__Active: ${MAIL_ACTIVE:-0}
+    restart: unless-stopped

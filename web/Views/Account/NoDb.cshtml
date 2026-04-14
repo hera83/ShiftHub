@@ -1,0 +1,53 @@
+﻿@model ShiftHub.Models.AccountModel
+@{
+    ViewData["Title"] = "Opret ny database";
+}
+<div class="container">
+    <table border="0" style="width: 100%; height: 40vh;">
+        <tr>
+            <td align="center" valign="middle">
+                <form action="NoDb" method="post">
+                    <table border="0">
+                        <tr>
+                            <td colspan="2" align="center" valign="top" style="height: 60px;">
+                                <h3>Administrator Bruger</h3>
+                                <hr />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right">
+                                <b>Brugernavn</b>&nbsp;
+                            </td>
+                            <td>
+                                <input type="text" asp-for="Username" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <span asp-validation-for="Username" class="text-danger"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right">
+                                <b>Adgangskode</b>&nbsp;
+                            </td>
+                            <td>
+                                <input type="password" asp-for="Password" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <span asp-validation-for="Username" class="text-danger"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" align="center" valign="bottom" style="height: 50px;">
+                                <button type="submit" class="btn btn-success btn-primary btn-sm">Opret</button>
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </td>
+        </tr>
+    </table>
+</div>

@@ -1,0 +1,129 @@
+﻿@model ShiftHub.Models.HomeModels
+@{
+    /// Title
+    ViewData["Title"] = "Brugere";
+
+    /// Messages
+    foreach (ShiftHub.Models.MessageModel.Message item in Model.Messages.aList)
+    {
+        <div class="alert alert-@item.Type.ToString().ToLower() d-flex align-items-center bs-popover-start" role="alert">
+            <table width="100%">
+                <tr>
+                    <td align="left" valign="middle" style="font-size: 16px;">
+                        @switch (item.Type.ToString())
+                        {
+                            case "Info":
+                                <i class="bi bi-info-circle"></i>
+                                break;
+                            case "Success":
+                                <i class="bi bi-check-circle"></i>
+                                break;
+                            case "Warning":
+                                <i class="bi bi-exclamation-circle"></i>
+
+                                break;
+                            case "Danger":
+                                <i class="bi bi-exclamation-diamond"></i>
+                                break;
+                        }
+                        @item.Content
+                    </td>
+                    <td align="right" valign="middle">
+                        <button type="button" id="@item.UiD" class="btn-close" data-bs-dismiss="alert" title="Luk"></button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        @if (item.Type.ToString() != "Danger")
+        {
+            <script type="text/javascript">
+                setTimeout(function () {
+                    document.getElementById('@item.UiD').click();
+                }, @item.AutoClose);
+            </script>
+        }
+    }
+}
+
+<div id="PopUpPlaceholder"></div>
+
+<div class="container">
+    <link href="~/css/jquery.dataTables.min.css" rel="stylesheet" />
+
+    <table id="UserTable" style="font-size: 18px;">
+        <thead>
+            <tr>
+                <th>
+                    Brugernavn
+                </th>
+                <th>
+                    Fuldenavn
+                </th>
+                <th>
+                    Mail
+                </th>
+                <th>
+                    Telefon
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (System.Data.DataRow aRow in Model.Data.aTable.Rows)
+            {
+                <tr>
+                    <td>
+                        @Html.Raw($"{aRow["Username"]}")
+                    </td>
+                    <td>
+                        @Html.Raw($"{aRow["DisplayName"]}")
+                    </td>
+                    <td>
+                        @Html.Raw($"{aRow["Mail"]}")
+                    </td>
+                    <td>
+                        @Html.Raw($"{aRow["Phone"]}")
+                    </td>
+                    <td>
+                        @if (Convert.ToInt32($"{aRow["Id"]}") != Model.UserDetails.UserId)
+                        {
+                            if ($"{aRow["Id"]}" == "1")
+                            {
+                                <i>Root User</i>
+                            }
+                            else
+                            {
+                                <ul class="nav navbar-nav">
+                                    <li class="dropdown">
+                                        <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown" style="color: black;">Menu</a>
+                                        <ul class="dropdown-menu" style="font-size: small;">
+                                            <li><button type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("EditUser", "Home", new { UserId = Convert.ToInt32(aRow["Id"]) })" style="width: 100%;" title="">Rediger</button></li>
+                                            <li><button type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("DeleteUser", "Home", new { UserId = Convert.ToInt32(aRow["Id"]) })" style="width: 100%;" title="">Slet</button></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            }
+                        }
+                        else
+                        {
+                            <i>Din Bruger</i>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script src="~/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#UserTable').DataTable({
+                stateSave: true,
+                fixedHeader: true,
+                "ordering": false
+            });
+        });
+    </script>
+}

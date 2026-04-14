@@ -1,0 +1,1267 @@
+﻿@model ShiftHub.Models.HomeModels
+@{
+    /// Title
+    ViewData["Title"] = "Planlægger";
+
+    /// Messages
+    foreach (ShiftHub.Models.MessageModel.Message item in Model.Messages.aList)
+    {
+                                                        <div class="alert alert-@item.Type.ToString().ToLower() d-flex align-items-center bs-popover-start" role="alert">
+                                                            <table width="100%">
+                                                                <tr>
+                                                                    <td align="left" valign="middle" style="font-size: 16px;">
+                                                                        @switch (item.Type.ToString())
+                        {
+                            case "Info":
+                                                                                <i class="bi bi-info-circle"></i>
+                                break;
+                            case "Success":
+                                                                                <i class="bi bi-check-circle"></i>
+                                break;
+                            case "Warning":
+                                                                                <i class="bi bi-exclamation-circle"></i>
+
+                                break;
+                            case "Danger":
+                                                                                <i class="bi bi-exclamation-diamond"></i>
+                                break;
+                        }
+                                                                          @item.Content
+                                                                    </td>
+                                                                    <td align="right" valign="middle">
+                                                                        <button type="button" id="@item.UiD" class="btn-close" data-bs-dismiss="alert" title="Luk"></button>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </div>
+    @if (item.Type.ToString() != "Danger")
+        {
+                                                            <script type="text/javascript">
+                                                                setTimeout(function () {
+                                                                    document.getElementById('@item.UiD').click();
+                                                                }, @item.AutoClose);
+                                                            </script>
+        }
+    }
+}
+
+<div class="show" id="PopUpPlaceholder"></div>
+
+<div>
+    <!-- Faste Variabler -->
+    <input type="hidden" id="SubGroupValue" />
+    <input type="hidden" id="DragSourceId" />
+</div>
+<div id="dataCollection">
+    <!-- Dynamiske Variabler -->
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-3">
+            <h5><i class="bi bi-collection"> Arrangementer</i></h5>
+            <hr />
+            <table border="0" width="100%">
+            @foreach (System.Data.DataRow aRow in Model.Data.aTable.Rows)
+            {
+                <tr>
+                    <td align="left" valign="middle">
+                        <button type="button" id="Sub_@Html.Raw($"{aRow["Id"]}")" class="btn light" onclick="SubGroupSelect(@Html.Raw($"{aRow["Id"]}"))" style="width: 100%; text-align: left; border: 1px solid lightgray;" title="@Html.Raw($"{aRow["Description"]}")">
+                            <b>@Html.Raw($"{aRow["Name"]}")</b>
+                        </button>
+                    </td>
+                    <td align="right" valign="middle" style="width: 30px;">
+                        <button type="button" class="btn lightButton" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("DeleteSubGroup", "Home", new { SubGroupId = Convert.ToInt32($"{aRow["Id"]}") })" title="Slet gruppe" @if ($"{aRow["Activated"]}" == "1" && User.IsInRole("Administrator") == false && User.IsInRole("InCharge") == false) { @Html.Raw(" disabled") }>
+                            <center><i class="bi bi-trash2" style="font-size: 1.2rem; color: gray;"></i></center>
+                        </button>
+                    </td>
+                </tr>
+            }
+            @if (Model.Data.aTable.Rows.Count == 0)
+            {
+                <tr>
+                    <td align="center" valign="middle">
+                        <i>Ingen grupper fundet</i>
+                    </td>
+                </tr>
+            }
+            </table>
+            <button type="button" class="btn lightButton" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("AddSubGroup", "Home", new { })" title="">
+                <center><i class="bi bi-patch-plus" style="font-size: 1.2rem; color: gray;"></i></center>
+            </button>
+        </div>
+        <div class="col my-1 m-1" id="workContainerId" style="display: none;">
+            <ul class="nav nav-pills nav-fill" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button type="button" class="nav-link light active" id="tab-one" data-bs-toggle="tab" data-bs-target="#one" role="tab" aria-controls="one" aria-selected="true">Dage</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button type="button" class="nav-link light" id="tab-two" data-bs-toggle="tab" data-bs-target="#two" role="tab" aria-controls="two" aria-selected="false">Vagter</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button type="button" class="nav-link light" id="tab-three" data-bs-toggle="tab" data-bs-target="#three" role="tab" aria-controls="three" aria-selected="false">Behov</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button type="button" class="nav-link light" id="tab-four" data-bs-toggle="tab" data-bs-target="#four" role="tab" aria-controls="four" aria-selected="false">Brugere</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button type="button" class="nav-link light" id="tab-five" data-bs-toggle="tab" data-bs-target="#five" role="tab" aria-controls="five" aria-selected="false">Tilmelding</button>
+                </li>
+            </ul>
+            <br />
+            <div class="tab-content" id="myTabContent">
+                <div id="AlertPlaceholder"></div>
+                <div class="tab-pane fade show active" id="one" role="tabpanel" aria-labelledby="tab-one">
+                    <!-- Dage -->
+                    <table width="100%">
+                        <tr>
+                            <td width="70%" valign="top">
+                                <div class="row">
+                                    <div class="col">
+                                        <button type="button" class="btn lightButton Activated LederAct" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("SubDaysAdd", "Home", new { })" title="Tilføj dag(e)">
+                                            <i class="bi bi-calendar-plus" style="font-size: 1.2rem; color: gray;"></i>
+                                        </button>
+                                    </div>
+                                    <div class="col" align="right">
+                                        <input class="form-control" type="text" id="daysFilterId" placeholder="Søg" onkeyup="daysUpdate()" style="width: 180px;" />
+                                    </div>
+                                </div>
+                                <table class="table" id="DaysList">
+                                </table>
+                            </td>
+                            <td width="30%" valign="top">
+                                <div style="margin: 0px 0px 0px 15px;">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            Døgnrytme
+                                        </div>
+                                        <div class="card-body">
+                                            <table width="100%">
+                                                <tr>
+                                                    <td width="49%">
+                                                        <input class="form-control form-control-sm Activated" type="time" value="00:00" onchange="daysCycleUpdate('change')" id="daysCycleStartId" title="OBS: Når denne ændres slettes alle vagter og behov!" />
+                                                    </td>
+                                                    <td width="2%"></td>
+                                                    <td width="49%">
+                                                        <input class="form-control form-control-sm" type="time" value="23:59" id="daysCycleEndId" readonly />
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="card" style="margin-top: 10px;">
+                                        <div class="card-header">
+                                            Noter
+                                        </div>
+                                        <div class="card-body">
+                                            <textarea rows="12" style="width: 100%; border: none;" onkeyup="daysNoteUpdate()" id="daysNoteId"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="tab-pane fade" id="two" role="tabpanel" aria-labelledby="tab-two">
+                    <!-- Vagter -->
+                    <table width="100%">
+                        <tr>
+                            <td width="70%" valign="top">
+                                <div class="row">
+                                    <div class="col">
+                                        <button type="button" class="btn lightButton Activated LederAct" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("SubShiftsAdd", "Home", new { })" title="Opret vagt">
+                                            <i class="bi bi-person-badge" style="font-size: 1.2rem; color: gray;"></i>
+                                        </button>
+                                        <button type="button" class="btn lightButton Activated LederAct" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("SubShiftsView", "Home", new { })" title="Se en samtælling af vagter">
+                                            <i class="bi bi-bar-chart" style="font-size: 1.2rem; color: gray;"></i>
+                                        </button>
+                                    </div>
+                                    <div class="col" align="right">
+                                        <input class="form-control" type="text" id="shiftsFilterId" placeholder="Søg" onkeyup="shiftsUpdate()" style="width: 180px;" />
+                                    </div>
+                                </div>
+                                <table class="table" id="ShiftsList">
+                                </table>
+                            </td>
+                            <td width="30%" valign="top">
+                                <div style="margin: 0px 0px 0px 15px;">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            Noter
+                                        </div>
+                                        <div class="card-body">
+                                            <textarea rows="12" style="width: 100%; border: none;" onkeyup="shiftsNoteUpdate()" id="shiftsNoteId"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="tab-pane fade" id="three" role="tabpanel" aria-labelledby="tab-three">
+                    <!-- Behov -->
+                    <table width="100%">
+                        <tr>
+                            <td width="70%" valign="top">
+                                <div class="row">
+                                    <div class="col" align="right">
+                                        <input class="form-control" type="text" id="needsFilterId" placeholder="Søg" onkeyup="needsUpdate()" style="width: 180px;" />
+                                    </div>
+                                </div>
+                                <table class="table" id="NeedsList">
+                                </table>
+                            </td>
+                            <td width="30%" valign="top">
+                                <div style="margin: 0px 0px 0px 15px;">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            Regler
+                                        </div>
+                                        <div class="card-body">
+                                            <table border="0" width="100%">
+                                                <tr>
+                                                    <td align="left" valign="middle">
+                                                        <u>Weekend vagt(er)</u>
+                                                    </td>
+                                                    <td align="right" valign="middle">
+                                                        <input type="checkbox" class="form-check-input Activated LederAct" id="needsRuleWeekend_Active" onclick="needsRuleWeekend(this)" />
+                                                    </td>
+                                                </tr>
+                                                <tr id="needsRuleWeekend_Container" style="display: none;">
+                                                    <td align="left" valign="middle">
+                                                        <input type="number" class="form-control form-control-sm Activated LederAct" id="needsRuleWeekend_Count" value="1" min="1" style="width: 50px; text-align: right;" onchange="needsRuleWeekendSave()" />
+                                                    </td>
+                                                    <td align="left" valign="middle">
+                                                        &nbsp;<i>Antal dage</i>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td align="left" valign="middle">
+                                                        <u>Antal timer</u>
+                                                    </td>
+                                                    <td align="right" valign="middle">
+                                                        <input type="checkbox" class="form-check-input Activated LederAct" id="needsRuleHours_Active" onclick="needsRuleHours(this)" />
+                                                    </td>
+                                                </tr>
+                                                <tr id="needsRuleHours_Container" style="display: none;">
+                                                    <td align="left" valign="middle">
+                                                        <input type="number" class="form-control form-control-sm Activated LederAct" id="needsRuleHours_Count" value="1" min="1" style="width: 50px; text-align: right;" onchange="needsRuleHoursSave()" />
+                                                    </td>
+                                                    <td align="left" valign="middle">
+                                                        &nbsp;<i>Antal timer</i>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td align="left" valign="middle">
+                                                        <u>Særlig Key</u>
+                                                    </td>
+                                                    <td align="right" valign="middle">
+                                                        <input type="checkbox" class="form-check-input Activated LederAct" id="needsRuleKeys_Active" onclick="needsRuleKeys(this)" />
+                                                    </td>
+                                                </tr>
+                                                <tr id="needsRuleKeys_Container" style="display: none;">
+                                                    <td colspan="2" align="left" valign="middle">
+                                                        <div id="needsRuleKeysView">
+                                                        </div>
+                                                        <table width="100%">
+                                                            <tr>
+                                                                <td align="center" valign="middle">
+                                                                    <button type="button" class="btn Activated LederAct" onclick="needsRuleKeysAdd()" id="needsRuleKeyAddButton"><i class="bi bi-plus-circle" style="font-size: 1.3rem;"></i></button>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="card" style="margin-top: 10px;">
+                                        <div class="card-header">
+                                            Noter
+                                        </div>
+                                        <div class="card-body">
+                                            <textarea rows="12" style="width: 100%; border: none;" onkeyup="needsNoteUpdate()" id="needsNoteId"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="tab-pane fade" id="four" role="tabpanel" aria-labelledby="tab-four">
+                    <!-- Brugere -->
+                    <table width="100%">
+                        <tr>
+                            <td>
+                                <div class="row">
+                                    <div class="col">
+                                        <button type="button" class="btn lightButton Activated LederAct" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("SubStaffAdd", "Home", new { })" title="Tilføj bruger">
+                                            <i class="bi bi-person-add" style="font-size: 1.2rem; color: gray;"></i>
+                                        </button>
+                                    </div>
+                                    <div class="col" align="right">
+                                        <input class="form-control" type="text" id="staffFilterId" placeholder="Søg" onkeyup="staffUpdate()" style="width: 180px;" />
+                                    </div>
+                                </div>
+                                <table class="table" id="StaffList">
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="tab-pane fade" id="five" role="tabpanel" aria-labelledby="tab-five">
+                    <!-- Tilmelding -->
+                    <table width="100%">
+                        <tr>
+                            <td id="ElementList" ondrop="formDrop(event)" ondragover="formAllowDrop(event)">
+                            </td>
+                        </tr>
+                        <tr><td height="20px"></td></tr>
+                        <tr>
+                            <td align="center" valign="middle">
+                                <button class="btn lightButton Activated LederAct" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("SubFormElements", "Home", new { })" title="Tilføj element">
+                                    <i class="bi bi-plus-circle" style="font-size: 2rem; color: gray;"></i>
+                                </button>
+                                <button class="btn lightButton Activated LederAct" onclick="formSave()" title="Gem tilmelding">
+                                    <i class="bi bi-floppy" style="font-size: 2rem; color: gray;"></i>
+                                </button>
+                                <button class="btn lightButton Activated" onclick="formActivate()" title="Aktiver & Send">
+                                    <i class="bi bi-browser-chrome" style="font-size: 2rem; color: gray;"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    /* Main Functions */
+    function SubGroupSelect(id) {
+        var SubGroupId = document.getElementById("SubGroupValue").value;
+
+        if (SubGroupId != "") {
+            document.getElementById("Sub_" + SubGroupId).classList.remove("SubGroupSelected");
+        } else {
+            document.getElementById("workContainerId").style = "display: block;";
+        }
+
+        document.getElementById("Sub_" + id).classList.add("SubGroupSelected");
+        document.getElementById("SubGroupValue").value = id;
+
+        $.ajax({
+            url: '/Home/_SubGroupData_Planner',
+            data: { SubGroupId: id }
+        }).done(function (returned) {
+            document.getElementById("dataCollection").innerHTML = returned;
+
+            // Update Days
+            daysUpdate(id);
+            if (document.getElementById("SubGroup_DaysCycle").value != "") {
+                document.getElementById("daysCycleStartId").value = document.getElementById("SubGroup_DaysCycle").value;
+                daysCycleUpdate();
+            }
+            document.getElementById("daysNoteId").value = document.getElementById("SubGroup_DaysNote").value;
+
+            // Update Shifts
+            shiftsUpdate(id);
+            document.getElementById("shiftsNoteId").value = document.getElementById("SubGroup_ShiftsNote").value;
+
+            // Update Needs
+            needsUpdate(id);
+            if (document.getElementById("SubGroup_NeedsRuleWeekend").value != "") {
+                document.getElementById("needsRuleWeekend_Active").checked = true;
+                document.getElementById("needsRuleWeekend_Container").style = "display: block;";
+                document.getElementById("needsRuleWeekend_Count").value = document.getElementById("SubGroup_NeedsRuleWeekend").value;
+            } else {
+                document.getElementById("needsRuleWeekend_Active").checked = false;
+                document.getElementById("needsRuleWeekend_Container").style = "display: none;";
+                document.getElementById("needsRuleWeekend_Count").value = "1";
+            }
+
+            if (document.getElementById("SubGroup_NeedsRuleHours").value != "") {
+                document.getElementById("needsRuleHours_Active").checked = true;
+                document.getElementById("needsRuleHours_Container").style = "display: block;";
+                document.getElementById("needsRuleHours_Count").value = document.getElementById("SubGroup_NeedsRuleHours").value;
+            } else {
+                document.getElementById("needsRuleHours_Active").checked = false;
+                document.getElementById("needsRuleHours_Container").style = "display: none;";
+                document.getElementById("needsRuleHours_Count").value = "1";
+            }
+
+            if (document.getElementById("SubGroup_NeedsRuleKeys").innerHTML != "") {
+                document.getElementById("needsRuleKeys_Active").checked = true;
+                document.getElementById("needsRuleKeys_Container").style = "display: block;";
+                needsRuleKeysUpdate();
+            } else {
+                document.getElementById("needsRuleKeys_Active").checked = false;
+                document.getElementById("needsRuleKeys_Container").style = "display: none;";
+                document.getElementById("needsRuleKeysView").innerHTML = '';
+            }
+
+            document.getElementById("needsNoteId").value = document.getElementById("SubGroup_NeedsNote").value;
+
+            // Update Staff
+            staffUpdate(id);
+
+            // Update Tilmelding
+            document.getElementById("ElementList").innerHTML = document.getElementById("SubGroup_Form").innerHTML;
+            document.getElementById("SubGroup_Form").innerHTML = ""; // Husk at nulstil ellers kommer den to gange!
+
+            // Deaktiver funktioner som ikke skal være tilgængelig når subgruppen aktiveres
+            lockDown();
+        });
+    }
+
+    /* Dage (Days) */
+    function daysUpdate(subGroupId) {
+        var filterValue = document.getElementById("daysFilterId").value;
+        var SubGroupId = "";
+
+        if (subGroupId == null) {
+            SubGroupId = document.getElementById("SubGroupValue").value;
+        } else {
+            SubGroupId = subGroupId;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_SubDaysUpdate",
+            data: { SubGroupId: SubGroupId, FilterValue: filterValue }
+        }).done(function (returned) {
+            document.getElementById("DaysList").innerHTML = returned;
+            
+            lockDown();
+
+            var PlaceHolderElement = $('#PopUpPlaceholder');
+
+            $('button[data-bs-toggle="daysUpdate-ajax-modal"]').click(function (event) {
+                var url = $(this).data('bs-url');
+                $.get(url).done(function (data) {
+                    PlaceHolderElement.html(data);
+                    PlaceHolderElement.find('.modal').modal('show');
+                })
+            })
+        });
+    }
+    function daysRemove(subGroupId, daysId) {
+        var UiD = new Date().getTime();
+        const regex = new RegExp('OK');
+
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_SubDaysRemove",
+            data: { SubGroupId: subGroupId, DaysId: daysId }
+        }).done(function (returned) {
+            daysUpdate(subGroupId);
+            shiftsUpdate(subGroupId);
+            needsUpdate(subGroupId);
+
+            if (regex.test(returned) == true) {
+                document.getElementById("AlertPlaceholder").innerHTML = "<div class=\"alert alert-success d-flex align-items-center bs-popover-start\" role=\"alert\">" +
+                    "<table width=\"100%\">" +
+                        "<tr>" +
+                            "<td align=\"left\" valign=\"middle\" style=\"font-size: 16px;\">" +
+                                "<i class=\"bi bi-check-circle\"></i>&nbsp;&nbsp;" +
+                                "Slettet" +
+                            "</td>" +
+                            "<td align=\"right\" valign=\"middle\">" +
+                                "<button type=\"button\" id=\"" + UiD + "\" class=\"btn-close\" data-bs-dismiss=\"alert\" title=\"Luk\"></button>" +
+                            "</td>" +
+                        "</tr>" +
+                    "</table>" +
+                    "<script type=\"text/javascript\">" +
+                        "setTimeout(function () {" +
+                            "document.getElementById('" + UiD + "').click();" +
+                        "}, 3000);" +
+                    "<\/script>" +
+                "</div>";
+            } else {
+                document.getElementById("AlertPlaceholder").innerHTML = "<div class=\"alert alert-danger d-flex align-items-center bs-popover-start\" role=\"alert\">" +
+                    "<table width=\"100%\">" +
+                        "<tr>" +
+                            "<td align=\"left\" valign=\"middle\" style=\"font-size: 16px;\">" +
+                    "<i class=\"bi bi-exclamation-diamond\"></i>&nbsp;&nbsp;" +
+                                returned +
+                            "</td>" +
+                            "<td align=\"right\" valign=\"middle\">" +
+                                "<button type=\"button\" id=\"" + UiD + "\" class=\"btn-close\" data-bs-dismiss=\"alert\" title=\"Luk\"></button>" +
+                            "</td>" +
+                        "</tr>" +
+                    "</table>" +
+                "</div>";
+            }
+        });
+    }
+    function daysCycleUpdate(type) {
+        var subGroupId = document.getElementById("SubGroupValue").value;
+
+        if (type == 'change') {
+            $.ajax({
+                type: 'POST',
+                url: "/Home/_KeyValueSave",
+                data: { SubGroupId: subGroupId, KeyName: "DaysCycle", KeyValue: document.getElementById("daysCycleStartId").value }
+            }).done(function (returned) {});
+
+            $.ajax({
+                type: 'POST',
+                url: "/Home/_DaysCycleCleenUp",
+                data: { SubGroupId: subGroupId }
+            }).done(function (returned) {
+                shiftsUpdate(subGroupId);
+                needsUpdate(subGroupId);
+            });
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_DaysCycleUpdate",
+            data: { DaysCycleStart: document.getElementById("daysCycleStartId").value }
+        }).done(function (returned) {
+            document.getElementById("daysCycleEndId").value = returned;
+        });
+    }
+    function daysNoteUpdate() {
+        var subGroupId = document.getElementById("SubGroupValue").value;
+
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_KeyValueSave",
+            data: { SubGroupId: subGroupId, KeyName: "DaysNote", KeyValue: document.getElementById("daysNoteId").value }
+        }).done(function (returned) { });
+    }
+
+    /* Vagter (Shifts) */
+    function shiftsUpdate(subGroupId) {
+        var filterValue = document.getElementById("shiftsFilterId").value;
+        var SubGroupId = "";
+
+        if (subGroupId == null) {
+            SubGroupId = document.getElementById("SubGroupValue").value;
+        } else {
+            SubGroupId = subGroupId;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_SubShiftsUpdate",
+            data: { SubGroupId: SubGroupId, FilterValue: filterValue }
+        }).done(function (returned) {
+            document.getElementById("ShiftsList").innerHTML = returned;
+
+            lockDown();
+
+            var PlaceHolderElement = $('#PopUpPlaceholder');
+
+            $('button[data-bs-toggle="shiftsUpdate-ajax-modal"]').click(function (event) {
+                var url = $(this).data('bs-url');
+                $.get(url).done(function (data) {
+                    PlaceHolderElement.html(data);
+                    PlaceHolderElement.find('.modal').modal('show');
+                })
+            })
+        });
+    }
+    function shiftsRemove(subGroupId, shiftsId) {
+        var UiD = new Date().getTime();
+        const regex = new RegExp('OK');
+
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_SubShiftsRemove",
+            data: { SubGroupId: subGroupId, ShiftsId: shiftsId }
+        }).done(function (returned) {
+            shiftsUpdate(subGroupId);
+            needsUpdate(subGroupId);
+
+            if (regex.test(returned) == true) {
+                document.getElementById("AlertPlaceholder").innerHTML = "<div class=\"alert alert-success d-flex align-items-center bs-popover-start\" role=\"alert\">" +
+                    "<table width=\"100%\">" +
+                        "<tr>" +
+                            "<td align=\"left\" valign=\"middle\" style=\"font-size: 16px;\">" +
+                                "<i class=\"bi bi-check-circle\"></i>&nbsp;&nbsp;" +
+                                "Slettet" +
+                            "</td>" +
+                            "<td align=\"right\" valign=\"middle\">" +
+                                "<button type=\"button\" id=\"" + UiD + "\" class=\"btn-close\" data-bs-dismiss=\"alert\" title=\"Luk\"></button>" +
+                            "</td>" +
+                        "</tr>" +
+                    "</table>" +
+                    "<script type=\"text/javascript\">" +
+                        "setTimeout(function () {" +
+                            "document.getElementById('" + UiD + "').click();" +
+                        "}, 3000);" +
+                    "<\/script>" +
+                "</div>";
+            } else {
+                document.getElementById("AlertPlaceholder").innerHTML = "<div class=\"alert alert-danger d-flex align-items-center bs-popover-start\" role=\"alert\">" +
+                    "<table width=\"100%\">" +
+                        "<tr>" +
+                            "<td align=\"left\" valign=\"middle\" style=\"font-size: 16px;\">" +
+                    "<i class=\"bi bi-exclamation-diamond\"></i>&nbsp;&nbsp;" +
+                                returned +
+                            "</td>" +
+                            "<td align=\"right\" valign=\"middle\">" +
+                                "<button type=\"button\" id=\"" + UiD + "\" class=\"btn-close\" data-bs-dismiss=\"alert\" title=\"Luk\"></button>" +
+                            "</td>" +
+                        "</tr>" +
+                    "</table>" +
+                "</div>";
+            }
+        });
+    }
+    function shiftsNoteUpdate() {
+        var subGroupId = document.getElementById("SubGroupValue").value;
+
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_KeyValueSave",
+            data: { SubGroupId: subGroupId, KeyName: "ShiftsNote", KeyValue: document.getElementById("shiftsNoteId").value }
+        }).done(function (returned) { });
+    }
+
+    /* Behov (Needs) */
+    function needsUpdate(subGroupId) {
+        var filterValue = document.getElementById("needsFilterId").value;
+        var SubGroupId = "";
+
+        if (subGroupId == null) {
+            SubGroupId = document.getElementById("SubGroupValue").value;
+        } else {
+            SubGroupId = subGroupId;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_SubNeedsUpdate",
+            data: { SubGroupId: SubGroupId, FilterValue: filterValue }
+        }).done(function (returned) {
+            document.getElementById("NeedsList").innerHTML = returned;
+
+            lockDown();
+
+            var PlaceHolderElement = $('#PopUpPlaceholder');
+
+            $('button[data-bs-toggle="needsUpdate-ajax-modal"]').click(function (event) {
+                var url = $(this).data('bs-url');
+                $.get(url).done(function (data) {
+                    PlaceHolderElement.html(data);
+                    PlaceHolderElement.find('.modal').modal('show');
+                })
+            })
+        });
+    }
+    function needsRuleWeekend(element) {
+        var subGroupId = document.getElementById("SubGroupValue").value;
+
+        if (element.checked == true) {
+            $.ajax({
+                type: 'POST',
+                url: "/Home/_KeyValueSave",
+                data: { SubGroupId: subGroupId, KeyName: "NeedsRuleWeekend", KeyValue: document.getElementById("needsRuleWeekend_Count").value }
+            }).done(function (returned) { });
+
+            document.getElementById("needsRuleWeekend_Container").style = "display: block;";
+        } else {
+            $.ajax({
+                type: 'POST',
+                url: "/Home/_KeyValueDelete",
+                data: { SubGroupId: subGroupId, KeyName: "NeedsRuleWeekend" }
+            }).done(function (returned) { });
+
+            document.getElementById("needsRuleWeekend_Container").style = "display: none;";
+            document.getElementById("needsRuleWeekend_Count").value = "1";
+        }
+    }
+    function needsRuleWeekendSave() {
+        var subGroupId = document.getElementById("SubGroupValue").value;
+
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_KeyValueSave",
+            data: { SubGroupId: subGroupId, KeyName: "NeedsRuleWeekend", KeyValue: document.getElementById("needsRuleWeekend_Count").value }
+        }).done(function (returned) { });
+    }
+    function needsRuleHours(element) {
+        var subGroupId = document.getElementById("SubGroupValue").value;
+
+        if (element.checked == true) {
+            $.ajax({
+                type: 'POST',
+                url: "/Home/_KeyValueSave",
+                data: { SubGroupId: subGroupId, KeyName: "NeedsRuleHours", KeyValue: document.getElementById("needsRuleHours_Count").value }
+            }).done(function (returned) { });
+
+            document.getElementById("needsRuleHours_Container").style = "display: block;";
+        } else {
+            $.ajax({
+                type: 'POST',
+                url: "/Home/_KeyValueDelete",
+                data: { SubGroupId: subGroupId, KeyName: "NeedsRuleHours" }
+            }).done(function (returned) { });
+
+            document.getElementById("needsRuleHours_Container").style = "display: none;";
+            document.getElementById("needsRuleHours_Count").value = "1";
+        }
+    }
+    function needsRuleHoursSave() {
+        var subGroupId = document.getElementById("SubGroupValue").value;
+
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_KeyValueSave",
+            data: { SubGroupId: subGroupId, KeyName: "NeedsRuleHours", KeyValue: document.getElementById("needsRuleHours_Count").value }
+        }).done(function (returned) { });
+    }
+    function needsRuleKeys(element) {
+        var subGroupId = document.getElementById("SubGroupValue").value;
+
+        if (element.checked == true) {
+            $.ajax({
+                type: 'POST',
+                url: "/Home/_KeyValueSave",
+                data: { SubGroupId: subGroupId, KeyName: "NeedsRuleKeys", KeyValue: '[]' }
+            }).done(function (returned) { });
+
+            document.getElementById("needsRuleKeys_Container").style = "display: block;";
+            document.getElementById("needsRuleKeyAddButton").style = "color: black;";
+            document.getElementById("needsRuleKeyAddButton").disabled = false;
+        } else {
+            $.ajax({
+                type: 'POST',
+                url: "/Home/_KeyValueDelete",
+                data: { SubGroupId: subGroupId, KeyName: "NeedsRuleKeys" }
+            }).done(function (returned) {
+                document.getElementById("needsRuleKeysView").innerHTML = '';
+            });
+
+            document.getElementById("needsRuleKeys_Container").style = "display: none;";
+        }
+    }
+    function needsRuleKeysAdd() {
+        var UiD = new Date().getTime();
+        var html = '<table width=\"100%\" id=\"' + UiD + '\" class=\"needsRuleKeysValue\">' +
+                '<tr>' +
+                    '<td colspan=\"2\">' +
+                        '<div class=\"form-group\">' +
+                            '<label for=\"title\">Title</label>' +
+                            '<input type=\"text\" name=\"title\" class=\"form-control form-control-sm Activated\" id=\"title_' + UiD + '\" onkeyup=\"needsRuleKeysSave()\" title=\"Hvordan skal det præsenteres for brugeren\" />' +
+                        '</div>' +
+                    '</td>' +
+                '</tr>' +
+                '<tr>' +
+                    '<td colspan=\"2\">' +
+                        '<div class=\"form-group\">' +
+                            '<label for=\"key\">Key</label>' +
+                            '<input type=\"text\" name=\"key\" class=\"form-control form-control-sm Activated\" id=\"key_' + UiD + '\" onkeyup=\"needsRuleKeysSave()\" title=\"Key på de vagter som de skal have\" />' +
+                        '</div>' +
+                    '</td>' +
+                '</tr>' +
+                '<tr>' +
+                    '<td width=\"50%\">' +
+                        '<div class=\"form-group\">' +
+                            '<label for=\"amount\">Antal</label>' +
+                            '<input type=\"number\" name=\"amount\" min=\"1\" value=\"1\" class=\"form-control form-control-sm Activated\" id=\"amount_' + UiD + '\" onkeyup=\"needsRuleKeysSave()\" onchange=\"needsRuleKeysSave()\" title=\"Hvormange vagter skal de have af denne type\" />' +
+                        '</div>' +
+                    '</td>' +
+                    '<td width=\"50%\" align=\"center\" valign=\"middle\">' +
+                        '<button type=\"button\" class=\"btn Activated\" onclick=\"needsRuleKeysRemove(\'' + UiD + '\')\"><i class=\"bi bi-trash2\" style=\"font-size: 1.3rem;\"></i></button>' +
+                    '</td>' +
+                '</tr>' +
+                '<tr><td colspan=\"2\"><hr /></td></tr>' +
+            '</table>';
+
+        document.getElementById("needsRuleKeysView").insertAdjacentHTML('beforeend', html);
+        document.getElementById("needsRuleKeyAddButton").style = "color: red;";
+        document.getElementById("needsRuleKeyAddButton").disabled = true;
+    }
+    function needsRuleKeysUpdate() { 
+        var dataObj = JSON.parse(document.getElementById("SubGroup_NeedsRuleKeys").innerHTML);
+        var UiD = new Date().getTime();
+        var html = '';
+
+        for (let i = 0; i < dataObj.length; i++) {
+            UiD = new Date().getTime();
+            html += '<table width=\"100%\" id=\"' + UiD + '\" class=\"needsRuleKeysValue\">' +
+                    '<tr>' +
+                        '<td colspan=\"2\">' +
+                            '<div class=\"form-group\">' +
+                                '<label for=\"title\">Title</label>' +
+                                '<input type=\"text\" name=\"title\" value=\"' + dataObj[i].Title + '\" class=\"form-control form-control-sm Activated\" id=\"title_' + UiD + '\" onkeyup=\"needsRuleKeysSave()\" title=\"Hvordan skal det præsenteres for brugeren\" />' +
+                            '</div>' +
+                        '</td>' +
+                    '</tr>' +
+                    '<tr>' +
+                        '<td colspan=\"2\">' +
+                            '<div class=\"form-group\">' +
+                                '<label for=\"key\">Key</label>' +
+                                '<input type=\"text\" name=\"key\" value=\"' + dataObj[i].Key + '\" class=\"form-control form-control-sm Activated\" id=\"key_' + UiD + '\" onkeyup=\"needsRuleKeysSave()\" title=\"Key på de vagter som de skal have\" />' +
+                            '</div>' +
+                        '</td>' +
+                    '</tr>' +
+                    '<tr>' +
+                        '<td width=\"50%\">' +
+                            '<div class=\"form-group\">' +
+                                '<label for=\"amount\">Antal</label>' +
+                                '<input type=\"number\" name=\"amount\" min=\"1\" value=\"' + dataObj[i].Amount + '\" class=\"form-control form-control-sm Activated\" id=\"amount_' + UiD + '\" onkeyup=\"needsRuleKeysSave()\" onchange=\"needsRuleKeysSave()\" title=\"Hvormange vagter skal de have af denne type\" />' +
+                            '</div>' +
+                        '</td>' +
+                        '<td width=\"50%\" align=\"center\" valign=\"middle\">' +
+                            '<button type=\"button\" class=\"btn Activated\" onclick=\"needsRuleKeysRemove(\'' + UiD + '\')\"><i class=\"bi bi-trash2\" style=\"font-size: 1.3rem;\"></i></button>' +
+                        '</td>' +
+                    '</tr>' +
+                    '<tr><td colspan=\"2\"><hr /></td></tr>' +
+                '</table>';
+        }
+
+        document.getElementById("needsRuleKeysView").innerHTML = html;
+    }
+    function needsRuleKeysRemove(id) {
+        document.getElementById(id).remove();
+
+        needsRuleKeysSave();
+    }
+    function needsRuleKeysSave() {
+        var SubGroupId = document.getElementById("SubGroupValue").value;
+        var keyValues = document.getElementsByClassName("needsRuleKeysValue");
+        var json = '[';
+        var saveValid = true;
+        
+        for (let i = 0; i < keyValues.length; i++) {
+            // Fjern alle mellemrum for key (Ellers virker validering ikke i tilmeldingen)
+            let ValueKey = document.getElementById('key_' + keyValues[i].id).value.replace(' ', '')
+                .replace('0', '').replace('1', '').replace('2', '').replace('3', '').replace('4', '')
+                .replace('5', '').replace('6', '').replace('7', '').replace('8', '').replace('9', '');
+            document.getElementById('key_' + keyValues[i].id).value = ValueKey;
+
+            if (document.getElementById('title_' + keyValues[i].id).value == '' || document.getElementById('key_' + keyValues[i].id).value == '') {
+                saveValid = false;
+            }
+
+            json += '{\"Title\": \"' + document.getElementById('title_' + keyValues[i].id).value + '\", \"Key\": \"' + document.getElementById('key_' + keyValues[i].id).value + '\", \"Amount\": ' + document.getElementById('amount_' + keyValues[i].id).value + '}';
+
+            if (i < (keyValues.length - 1)) {
+                json += ',';
+            }
+        }
+
+        json += ']';
+
+        if (saveValid == true) {
+            $.ajax({
+                type: 'POST',
+                url: "/Home/_SubNeedsRuleKeysSave",
+                data: { SubGroupId: SubGroupId, Keys: json }
+            }).done(function (returned) { });
+
+            document.getElementById("needsRuleKeyAddButton").style = "color: black;";
+            document.getElementById("needsRuleKeyAddButton").disabled = false;
+        } else {
+            document.getElementById("needsRuleKeyAddButton").style = "color: red;";
+            document.getElementById("needsRuleKeyAddButton").disabled = true;
+        }
+
+        console.log(json);
+    }
+    function needsNoteUpdate() {
+        var subGroupId = document.getElementById("SubGroupValue").value;
+
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_KeyValueSave",
+            data: { SubGroupId: subGroupId, KeyName: "NeedsNote", KeyValue: document.getElementById("needsNoteId").value }
+        }).done(function (returned) { });
+    }
+
+    /* Brugere (Staff) */
+    function staffUpdate(subGroupId) {
+        var filterValue = document.getElementById("staffFilterId").value;
+        var SubGroupId = "";
+
+        if (subGroupId == null) {
+            SubGroupId = document.getElementById("SubGroupValue").value;
+        } else {
+            SubGroupId = subGroupId;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_SubStaffUpdate",
+            data: { SubGroupId: SubGroupId, FilterValue: filterValue }
+        }).done(function (returned) {
+            document.getElementById("StaffList").innerHTML = returned;
+
+            lockDown();
+
+            var PlaceHolderElement = $('#PopUpPlaceholder');
+
+            $('button[data-bs-toggle="staffUpdate-ajax-modal"]').click(function (event) {
+                var url = $(this).data('bs-url');
+                $.get(url).done(function (data) {
+                    PlaceHolderElement.html(data);
+                    PlaceHolderElement.find('.modal').modal('show');
+                })
+            })
+        });
+    }
+    function staffRemove(subGroupId, staffId) {
+        var UiD = new Date().getTime();
+        const regex = new RegExp('OK');
+
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_SubStaffRemove",
+            data: { SubGroupId: subGroupId, StaffId: staffId }
+        }).done(function (returned) {
+            staffUpdate(subGroupId);
+
+            if (regex.test(returned) == true) {
+                document.getElementById("AlertPlaceholder").innerHTML = "<div class=\"alert alert-success d-flex align-items-center bs-popover-start\" role=\"alert\">" +
+                    "<table width=\"100%\">" +
+                        "<tr>" +
+                            "<td align=\"left\" valign=\"middle\" style=\"font-size: 16px;\">" +
+                                "<i class=\"bi bi-check-circle\"></i>&nbsp;&nbsp;" +
+                                "Fjernet" +
+                            "</td>" +
+                            "<td align=\"right\" valign=\"middle\">" +
+                                "<button type=\"button\" id=\"" + UiD + "\" class=\"btn-close\" data-bs-dismiss=\"alert\" title=\"Luk\"></button>" +
+                            "</td>" +
+                        "</tr>" +
+                    "</table>" +
+                    "<script type=\"text/javascript\">" +
+                        "setTimeout(function () {" +
+                            "document.getElementById('" + UiD + "').click();" +
+                        "}, 3000);" +
+                    "<\/script>" +
+                "</div>";
+            } else {
+                document.getElementById("AlertPlaceholder").innerHTML = "<div class=\"alert alert-danger d-flex align-items-center bs-popover-start\" role=\"alert\">" +
+                    "<table width=\"100%\">" +
+                        "<tr>" +
+                            "<td align=\"left\" valign=\"middle\" style=\"font-size: 16px;\">" +
+                    "<i class=\"bi bi-exclamation-diamond\"></i>&nbsp;&nbsp;" +
+                                returned +
+                            "</td>" +
+                            "<td align=\"right\" valign=\"middle\">" +
+                                "<button type=\"button\" id=\"" + UiD + "\" class=\"btn-close\" data-bs-dismiss=\"alert\" title=\"Luk\"></button>" +
+                            "</td>" +
+                        "</tr>" +
+                    "</table>" +
+                "</div>";
+            }
+        });
+    }
+    function lockDown() {
+        const buttons = document.getElementsByClassName("Activated");
+        if (document.getElementById("SubGroup_Activated").value == "1") {
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = true;
+            }
+        } else {
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = false;
+            }
+        }
+
+        if ('@Html.Raw($"{User.IsInRole("Administrator")}")' == 'True' || '@Html.Raw($"{User.IsInRole("InCharge")}")' == 'True') {
+            const lButtons = document.getElementsByClassName("LederAct");
+            if (document.getElementById("SubGroup_Activated").value == "1") {
+                for (let i = 0; i < lButtons.length; i++) {
+                    lButtons[i].disabled = false;
+                }
+            }
+        }
+    }
+
+    /* Tilmelding (Form) */
+    function formAddText() {
+        var UiD = new Date().getTime();
+        var Elements = document.getElementById("ElementList").innerHTML;
+        let textareaCounter = 0;
+        const textareaValues = new Array();
+        const regExTextarea = new RegExp('CardText');
+
+        var NewElement = "<div id=\"Card_" + UiD + "\" class=\"card\" style=\"margin-bottom: 25px;\" draggable=\"true\" ondragstart=\"formDrag(event)\" ondragend=\"formDragend()\">" +
+            "<div class=\"card-header\">" +
+                "<table width=\"100%\">" +
+                    "<tr>" +
+                        "<td align=\"left\" valign=\"middle\">" +
+                            "Tekst Element" +
+                        "</td>" +
+                        "<td align=\"right\" valign=\"middle\">"+
+                            "<button type=\"button\" class=\"btn lightButton Activated LederAct\" title=\"Flettefelter:&#013;#navn&#013;#adresse&#013;#postnr&#013;#by&#013;#foedselsdag&#013;#mail&#013;#telefonnr&#013;#key1&#013;#key2&#013;#key3\">" +
+                                "<i class=\"bi bi-link-45deg\" style=\"font-size: 1.2rem; color: gray;\"></i>" +
+                            "</button>" +
+                            "<button type=\"button\" class=\"btn lightButton Activated LederAct\" onclick=\"formDeleteElement('" + UiD + "')\" title=\"Slet element\">" +
+                                "<i class=\"bi bi-trash2\" style=\"font-size: 1.2rem; color: gray;\"></i>" +
+                            "</button>" +
+                        "</td>" +
+                    "</tr>" +
+                "</table>" +
+            "</div>" +
+            "<div class=\"card-body\">" +
+                "<textarea class=\"form-control Activated LederAct FormElement\" rows=\"4\" id=\"CardText_" + UiD + "\"></textarea>" +
+            "</div>" +
+        "</div>";
+
+        // Save values
+        if (document.getElementsByTagName("textarea").length > 0) {
+            for (let i = 0; i < document.getElementsByTagName("textarea").length; i++) {
+                if (regExTextarea.test(document.getElementsByTagName("textarea")[i].id) == true && document.getElementsByTagName("textarea")[i].value != null) {
+                    textareaValues.push(document.getElementsByTagName("textarea")[i].value);
+                }
+            }
+        }
+
+        // Update layout
+        document.getElementById("ElementList").innerHTML = Elements + NewElement;
+
+        // Insert values
+        if (document.getElementsByTagName("textarea").length > 0) {
+            for (let i = 0; i < document.getElementsByTagName("textarea").length; i++) {
+                if (regExTextarea.test(document.getElementsByTagName("textarea")[i].id) == true && document.getElementsByTagName("textarea")[i].value != null) {
+                    if (textareaValues[textareaCounter] != null) {
+                        document.getElementsByTagName("textarea")[i].value = textareaValues[textareaCounter];
+
+                        textareaCounter++;
+                    }
+                }
+            }
+        }
+    }
+    function formAddLink() {
+        var UiD = new Date().getTime();
+        var Elements = document.getElementById("ElementList").innerHTML;
+        let textareaCounter = 0;
+        const textareaValues = new Array();
+        const regExTextarea = new RegExp('CardText');
+
+        var NewElement = "<div id=\"Card_" + UiD + "\" class=\"card\" style=\"margin-bottom: 25px;\" draggable=\"true\" ondragstart=\"formDrag(event)\" ondragend=\"formDragend()\">" +
+            "<div class=\"card-header\">" +
+                "<table width=\"100%\">" +
+                    "<tr>" +
+                        "<td align=\"left\" valign=\"middle\">" +
+                            "Link Element" +
+                        "</td>" +
+                        "<td align=\"right\" valign=\"middle\">"+
+                            "<button type=\"button\" class=\"btn lightButton Activated LederAct\" data-bs-toggle=\"collapse\" data-bs-target=\"#EditSection_" + UiD + "\" aria-expanded=\"false\" aria-controls=\"EditSection_" + UiD + "\" title=\"Rediger element\">" +
+                                "<i class=\"bi bi-pencil\" style=\"font-size: 1.2rem; color: gray;\"></i>" +
+                            "</button>" +
+                            "<button type=\"button\" class=\"btn lightButton Activated LederAct\" onclick=\"formDeleteElement('" + UiD + "')\" title=\"Slet element\">" +
+                                "<i class=\"bi bi-trash2\" style=\"font-size: 1.2rem; color: gray;\"></i>" +
+                            "</button>" +
+                        "</td>" +
+                    "</tr>" +
+                "</table>" +
+            "</div>" +
+            "<div class=\"card-body\">" +
+                "<a class=\"btn btn-success FormElement\" id=\"LinkId_" + UiD + "\" href=\"@Html.Raw($"{Model.HostName}")/Tilmelding?form=" + document.getElementById("SubGroup_UiD").value + "\" target=\"_blank\">Tilmelding. klik her...</a>" +
+            "</div>" +
+            "<div class=\"panel-body collapse\" id=\"EditSection_" + UiD + "\" style=\"margin: 0px 15px 0px 15px;\">" +
+                "<hr />" +
+                "<table width=\"100%\">" +
+                    "<tr>" +
+                        "<td colspan=\"3\">" +
+                            "<font style=\"font-size: 14px; color: gray;\">Link navn</font>" +
+                            "<input type=\"text\" class=\"form-control\" id=\"LinkValue_" + UiD + "\" onkeyup=\"formLinkRename('" + UiD + "')\" placeholder=\"Link navn\" value=\"Tilmelding. klik her...\" />" +
+                        "</td>" +
+                    "</tr>" +
+                    "<tr><td colspan=\"3\" height=\"10px\"></td></tr>" +
+                    "<tr>" +
+                        "<td width=\"33%\" align=\"center\" valign=\"middle\">" +
+                            "<font style=\"font-size: 14px; color: gray;\">Bootstrap</font>" +
+                        "</td>" +
+                        "<td width=\"34%\" align=\"center\" valign=\"middle\">" +
+                            "<font style=\"font-size: 14px; color: gray;\">Html</font>" +
+                        "</td>" +
+                        "<td width=\"33%\" align=\"center\" valign=\"middle\">" +
+                            "<font style=\"font-size: 14px; color: gray;\">Raw</font>" +
+                        "</td>" +
+                    "</tr>" +
+                    "<tr>" +
+                        "<td align=\"center\" valign=\"middle\">" +
+                            "<input type=\"radio\" name=\"menuChoice\" onchange=\"formLinkChange('" + UiD + "','bootstrap')\" style=\"height:18px; width:18px; vertical-align: middle;\" checked />" +
+                        "</td>" +
+                        "<td align=\"center\" valign=\"middle\">" +
+                            "<input type=\"radio\" name=\"menuChoice\" onchange=\"formLinkChange('" + UiD + "','html')\" style=\"height:18px; width:18px; vertical-align: middle;\" />" +
+                        "</td>" +
+                        "<td align=\"center\" valign=\"middle\">" +
+                            "<input type=\"radio\" name=\"menuChoice\" onchange=\"formLinkChange('" + UiD + "','raw')\" style=\"height:18px; width:18px; vertical-align: middle;\" />" +
+                        "</td>" +
+                    "</tr>" +
+                    "<tr><td colspan=\"3\" height=\"10px\"></td></tr>" +
+                "</table>" +
+            "</div>" +
+        "</div>";
+
+        // Save values
+        if (document.getElementsByTagName("textarea").length > 0) {
+            for (let i = 0; i < document.getElementsByTagName("textarea").length; i++) {
+                if (regExTextarea.test(document.getElementsByTagName("textarea")[i].id) == true && document.getElementsByTagName("textarea")[i].value != null) {
+                    textareaValues.push(document.getElementsByTagName("textarea")[i].value);
+                }
+            }
+        }
+
+        // Update layout
+        document.getElementById("ElementList").innerHTML = Elements + NewElement;
+
+        // Insert values
+        if (document.getElementsByTagName("textarea").length > 0) {
+            for (let i = 0; i < document.getElementsByTagName("textarea").length; i++) {
+                if (regExTextarea.test(document.getElementsByTagName("textarea")[i].id) == true && document.getElementsByTagName("textarea")[i].value != null) {
+                    if (textareaValues[textareaCounter] != null) {
+                        document.getElementsByTagName("textarea")[i].value = textareaValues[textareaCounter];
+
+                        textareaCounter++;
+                    }
+                }
+            }
+        }
+    }
+        
+    function formDeleteElement(id) {
+        document.getElementById("Card_" + id).remove();
+    }
+    function formLinkRename(id) {
+        var linkValue = document.getElementById("LinkValue_" + id).value;
+
+        document.getElementById("LinkId_" + id).innerHTML = linkValue;
+    }
+    function formLinkChange(id, type) {
+        var linkValue = document.getElementById("LinkValue_" + id).value;
+
+        switch(type) {
+            case "bootstrap":
+                document.getElementById("LinkValue_" + id).disabled = false;
+                document.getElementById("LinkId_" + id).classList.remove("btn");
+                document.getElementById("LinkId_" + id).classList.remove("btn-success");
+                document.getElementById("LinkId_" + id).classList.add("btn");
+                document.getElementById("LinkId_" + id).classList.add("btn-success");
+                document.getElementById("LinkId_" + id).innerHTML = linkValue;
+                break;
+            case "html":
+                document.getElementById("LinkValue_" + id).disabled = false;
+                document.getElementById("LinkId_" + id).classList.remove("btn");
+                document.getElementById("LinkId_" + id).classList.remove("btn-success");
+                document.getElementById("LinkId_" + id).innerHTML = linkValue;
+                break;
+            case "raw":
+                document.getElementById("LinkValue_" + id).disabled = true;
+                document.getElementById("LinkId_" + id).classList.remove("btn");
+                document.getElementById("LinkId_" + id).classList.remove("btn-success");
+                document.getElementById("LinkId_" + id).innerHTML = document.getElementById("LinkId_" + id).href;
+                break;
+        }
+    }
+
+    function formAllowDrop(ev) {
+        const SourceId = document.getElementById("DragSourceId").value;
+        const TargegId = ev.target.id;
+        const regExList = new RegExp('ElementList');
+
+        if (regExList.test(TargegId) == true) {
+            ev.preventDefault();
+        }
+    }
+    function formDrag(ev) {
+        for (var i = 0; i < document.getElementsByTagName("textarea").length; i++) {
+            document.getElementsByTagName("textarea")[i].readOnly = true;
+        }
+
+        ev.dataTransfer.setData("text", ev.target.id);
+        document.getElementById("DragSourceId").value = ev.dataTransfer.getData("text");
+    }
+    function formDragend() {
+        for (var i = 0; i < document.getElementsByTagName("textarea").length; i++) {
+            document.getElementsByTagName("textarea")[i].readOnly = false;
+        }
+    }
+    function formDrop(ev) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        ev.target.appendChild(document.getElementById(data));
+    }
+
+    function formSave() {
+        var UiD = new Date().getTime();
+        var subGroupId = document.getElementById("SubGroupValue").value;
+        var formRaw = document.getElementById("ElementList").innerHTML;
+        var formData = new Array();
+        var formContent = document.getElementsByClassName("FormElement");
+        const regex = new RegExp('OK');
+
+        /* Generate Data Array */
+        formData = [];
+        for (let i = 0; i < formContent.length; i++) {
+            if (formContent[i].href == null) {
+                formData.push("textarea");
+                formData.push(formContent[i].value);
+            } else {
+                formData.push("link");
+                formData.push(formContent[i].id);
+            }
+        }
+        
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_SubFormSave",
+            data: { SubGroupId: subGroupId, SubGroupForm: String(formRaw), SubGroupData: JSON.stringify(formData) },
+            dataType: "text"
+        }).done(function (returned) {
+            if (regex.test(returned) == true) {
+                document.getElementById("AlertPlaceholder").innerHTML = "<div class=\"alert alert-success d-flex align-items-center bs-popover-start\" role=\"alert\">" +
+                    "<table width=\"100%\">" +
+                        "<tr>" +
+                            "<td align=\"left\" valign=\"middle\" style=\"font-size: 16px;\">" +
+                    "<i class=\"bi bi-check-circle\"></i>&nbsp;&nbsp;" +
+                                "Gemt" +
+                            "</td>" +
+                            "<td align=\"right\" valign=\"middle\">" +
+                                "<button type=\"button\" id=\"" + UiD + "\" class=\"btn-close\" data-bs-dismiss=\"alert\" title=\"Luk\"></button>" +
+                            "</td>" +
+                        "</tr>" +
+                    "</table>" +
+                    "<script type=\"text/javascript\">" +
+                        "setTimeout(function () {" +
+                            "document.getElementById('" + UiD + "').click();" +
+                        "}, 3000);" +
+                    "<\/script>" +
+                "</div>";
+            } else {
+                document.getElementById("AlertPlaceholder").innerHTML = "<div class=\"alert alert-danger d-flex align-items-center bs-popover-start\" role=\"alert\">" +
+                    "<table width=\"100%\">" +
+                        "<tr>" +
+                            "<td align=\"left\" valign=\"middle\" style=\"font-size: 16px;\">" +
+                    "<i class=\"bi bi-exclamation-diamond\"></i>&nbsp;&nbsp;" +
+                                returned +
+                            "</td>" +
+                            "<td align=\"right\" valign=\"middle\">" +
+                                "<button type=\"button\" id=\"" + UiD + "\" class=\"btn-close\" data-bs-dismiss=\"alert\" title=\"Luk\"></button>" +
+                            "</td>" +
+                        "</tr>" +
+                    "</table>" +
+                "</div>";
+            }
+        });
+    }
+    function formActivate() {
+        var subGroupId = document.getElementById("SubGroupValue").value;
+        formSave();
+
+        $.ajax({
+            type: 'GET',
+            url: "/Home/SubFormActivate",
+            data: { SubGroupId: subGroupId }
+        }).done(function (returned) {
+            var PlaceHolderElement = $('#PopUpPlaceholder');
+
+            PlaceHolderElement.html(returned);
+            PlaceHolderElement.find('.modal').modal('show');
+        });
+    }
+
+</script>

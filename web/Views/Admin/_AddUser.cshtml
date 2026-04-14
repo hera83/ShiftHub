@@ -1,0 +1,109 @@
+﻿@model ShiftHub.Models.AdminModels
+
+<div class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Opret Bruger</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <form action="AddUser" method="post">
+                    <div class="form-group">
+                        <label asp-for="User.Username">Brugernavn</label>
+                        <input asp-for="User.Username" class="form-control" id="UsernameId" readonly />
+                        <span asp-validation-for="User.Username" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="User.Password">Adgangskode</label>
+                        <input type="password" asp-for="User.Password" onchange="vSave()" class="form-control" id="PasswordId" />
+                        <span asp-validation-for="User.Password" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="User.GroupId">Gruppe</label>
+                        <select asp-for="User.GroupId" onchange="vSave()" class="form-control" id="GroupIdId">
+                            <option value="0">Gruppe 0</option>
+                            @foreach (System.Data.DataRow row in Model.Data.aTable.Rows)
+                            {
+                                <option value="@row["Id"].ToString()">@row["Name"].ToString()</option>
+                            }
+                        </select>
+                        <span asp-validation-for="User.GroupId" class="text-danger"></span>
+                    </div>
+                    <hr />
+                    <div class="form-group">
+                        <label asp-for="User.DisplayName">Fuldenavn</label>
+                        <input asp-for="User.DisplayName" onchange="GenerateUsername()" class="form-control" id="DisplayNameId" />
+                        <span asp-validation-for="User.DisplayName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="User.Mail">Mail</label>
+                        <input type="email" asp-for="User.Mail" onchange="CheckNotification()" class="form-control" id="MailId" />
+                        <span asp-validation-for="User.Mail" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="User.Phone">Telefon Nr</label>
+                        <input asp-for="User.Phone" class="form-control" />
+                        <span asp-validation-for="User.Phone" class="text-danger"></span>
+                    </div>
+                    <hr />
+                    <div class="form-group form-switch">
+                        <input type="checkbox" asp-for="User.Notification" class="form-check-input" id="NotificationId" disabled />&nbsp;
+                        <label asp-for="User.Notification" title="Velkomst Mail">Notifikation</label>
+                        <span asp-validation-for="User.Notification" class="text-danger"></span>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-save="modal" id="AddId" disabled>Opret</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Luk</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function vSave() {
+        var UsernameValue = document.getElementById("UsernameId").value;
+        var PasswordValue = document.getElementById("PasswordId").value;
+        var GroupIdValue = document.getElementById("GroupIdId").value;
+        var DisplayNameValue = document.getElementById("DisplayNameId").value;
+
+        if (UsernameValue != "" && PasswordValue != "" && GroupIdValue != "" && DisplayNameValue != "") {
+            document.getElementById("AddId").disabled = false;
+        } else {
+            document.getElementById("AddId").disabled = true;
+        }
+    }
+
+    function GenerateUsername() {
+        var DisplayNameValue = document.getElementById("DisplayNameId").value;
+
+        $.ajax({
+            url: '/Admin/_GenerateUsername',
+            data: { DisplayName: DisplayNameValue }
+        }).done(function (returned) {
+            document.getElementById("UsernameId").value = returned;
+
+            vSave();
+        });
+    }
+    function CheckNotification() {
+        var MailValue = document.getElementById("MailId").value;
+        var NotificationValue = document.getElementById("NotificationId").checked;
+
+        if (MailValue != "") {
+            if (NotificationValue == false) {
+                document.getElementById("NotificationId").checked = true;
+            }
+            document.getElementById("NotificationId").disabled = false;
+        } else {
+            document.getElementById("NotificationId").checked = false;
+            document.getElementById("NotificationId").disabled = true;
+        }
+
+        vSave();
+    }
+</script>

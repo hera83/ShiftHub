@@ -1,0 +1,32 @@
+﻿@model ShiftHub.Models.HomeModels
+
+<div class="modal fade">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Registrerede vagter</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <table class="table" width="100%" id="RegistrationsView"></table>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    updateRegistrations();
+
+    function updateRegistrations() {
+        var subGroupId = document.getElementById("SubGroupValue").value;
+
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_SubShiftsViewUpdateRegistrations",
+            data: { SubGroupId: subGroupId }
+        }).done(function (returned) {
+            document.getElementById("RegistrationsView").innerHTML = returned;
+        });
+    }
+
+</script>

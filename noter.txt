@@ -1,0 +1,28 @@
+#############
+# Next Step #
+#############
+
+Når man checker en ud opdatere det ikke på pc2
+Der skal være en søgebar i dashboard
+
+Prioritering:
+ 1. Byg overordnet besked center
+
+Uprioriteret:
+ * Lav notifikations flow under adm opret bruger / gruppe niveau
+ * Lav SMS takserings overblik til gruppe ansvarlig og til mig
+ * Lav en sort order under dashboard, så hvis man flytter en post i toppen eller en bruger i toppen, så bliver den også der.
+
+Oprydning:
+ * Mangler under AdminControler Slet gruppe -> Slet alt under SubGroups
+
+
+#################################
+
+[InOut]
+1 = Sendt fra systemet
+2 = Sendt fra en bruger
+
+[State]
+0 = Er ikke læst og skal fremhæves
+1 = Skal ikke fremhæves (Kan komme fra både systemet og fra brugeren)

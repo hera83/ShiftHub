@@ -1,0 +1,203 @@
+﻿@model ShiftHub.Models.HomeModels
+
+<div class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Rediger vagt</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" asp-for="SubShifts.DayId" id="DaysId" />
+                <input type="hidden" asp-for="SubShifts.ShiftsId" id="ShiftsId" />
+
+                <div id="PopUpDynamicData">
+                    <input type="hidden" id="StartTimeMin" />
+                    <input type="hidden" id="EndTimeMax" />
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="SubShifts.Name">Navn</label>
+                    <input asp-for="SubShifts.Name" class="form-control" onchange="checkShift()" onkeyup="checkShift()" id="NameId" />
+                    <span asp-validation-for="SubShifts.Name" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="SubShifts.type">Type</label>
+                    <select asp-for="SubShifts.type" class="form-control" onchange="changeType()" id="TypeId">
+                        <option>Fixed</option>
+                        <option disabled>Flex</option>
+                    </select>
+                    <span asp-validation-for="SubShifts.type" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="SubShifts.StartTime">Start</label>
+                    <input asp-for="SubShifts.StartTime" class="form-control" onchange="checkShift()" id="StartTimeId" />
+                    <span asp-validation-for="SubShifts.StartTime" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="SubShifts.EndTime">Slut</label>
+                    <input asp-for="SubShifts.EndTime" class="form-control" onchange="checkShift()" id="EndTimeId" />
+                    <span asp-validation-for="SubShifts.EndTime" class="text-danger"></span>
+                </div>
+                <div class="form-group" id="NeedsId">
+                    <label asp-for="SubShifts.StaffNeeds">Behov</label>
+                    <input asp-for="SubShifts.StaffNeeds" class="form-control" onchange="checkShift()" id="StaffNeedsId" />
+                    <span asp-validation-for="SubShifts.StaffNeeds" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="SubShifts.Key1">Key</label>
+                    <input asp-for="SubShifts.Key1" class="form-control" onkeyup="checkKey()" id="keyId" />
+                    <span asp-validation-for="SubShifts.Key1" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="EditShift()" id="EditId">Gem</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Luk</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var runOnLoad = loadShift();
+
+    function loadShift() {
+        changeDays();
+        changeType();
+    }
+    function checkShift() {
+        var CheckSum = true;
+        var subGroupId = document.getElementById("SubGroupValue").value;
+        var daysId = document.getElementById("DaysId").value;
+        var NameValue = document.getElementById("NameId").value;
+        var TypeValue = document.getElementById("TypeId").value;
+        var StartTimeValue = document.getElementById("StartTimeId").value;
+        var EndTimeValue = document.getElementById("EndTimeId").value;
+        var StaffNeedsValue = document.getElementById("StaffNeedsId").value;
+        const regex = new RegExp('OK');
+
+        if (NameValue == "") {
+            CheckSum = false
+        }
+        if (TypeValue == "Fixed" && StaffNeedsValue <= 0) {
+            CheckSum = false
+        }
+        if (CheckSum == true) {
+            $.ajax({
+                url: '/Home/_SubShiftsDaysCheck',
+                data: { SubGroupId: subGroupId, SubDayId: daysId, SubStartTime: StartTimeValue, SubEndTime: EndTimeValue }
+            }).done(function (returned) {
+                if (regex.test(returned) == true) {
+                    document.getElementById("EditId").disabled = false;
+                } else {
+                    document.getElementById("EditId").disabled = true;
+                }
+            });
+        } else {
+            document.getElementById("EditId").disabled = true;
+        }
+    }
+    function checkKey() {
+        // Fjern alle mellemrum for key (Ellers virker validering ikke i tilmeldingen)
+        let ValueKey = document.getElementById('keyId').value.replace(' ', '')
+            .replace('0', '').replace('1', '').replace('2', '').replace('3', '').replace('4', '')
+            .replace('5', '').replace('6', '').replace('7', '').replace('8', '').replace('9', '');
+        document.getElementById('keyId').value = ValueKey;
+    }
+    
+    function changeDays() {
+        var subGroupId = document.getElementById("SubGroupValue").value;
+        var daysId = document.getElementById("DaysId").value;
+
+        $.ajax({
+            url: '/Home/_SubShiftsTimeUpdate',
+            data: { SubGroupId: subGroupId, SubDayId: daysId }
+        }).done(function (returned) {
+            document.getElementById("PopUpDynamicData").innerHTML = returned;
+            
+            document.getElementById("StartTimeId").min = document.getElementById("StartTimeMin").value;
+            document.getElementById("StartTimeId").max = document.getElementById("EndTimeMax").value;
+
+            document.getElementById("EndTimeId").min = document.getElementById("StartTimeMin").value;
+            document.getElementById("EndTimeId").max = document.getElementById("EndTimeMax").value;
+        });
+    }
+    function changeType() {
+        if (document.getElementById("TypeId").value == "Fixed") {
+            if (document.getElementById("StaffNeedsId").value == 0)
+            {
+                document.getElementById("StaffNeedsId").value = 1;
+            }
+            document.getElementById("NeedsId").style = "display: block;";
+        } else {
+            document.getElementById("StaffNeedsId").value = 0;
+            document.getElementById("NeedsId").style = "display: none;";
+        }
+
+        checkShift();
+    }
+
+    function EditShift() {
+        var PlaceHolderElement = $('#PopUpPlaceholder');
+        var subGroupId = document.getElementById("SubGroupValue").value;
+        var daysId = document.getElementById("DaysId").value;
+        var shiftsId = document.getElementById("ShiftsId").value;
+        var NameValue = document.getElementById("NameId").value;
+        var TypeValue = document.getElementById("TypeId").value;
+        var StartTimeValue = document.getElementById("StartTimeId").value;
+        var EndTimeValue = document.getElementById("EndTimeId").value;
+        var StaffNeedsValue = document.getElementById("StaffNeedsId").value;
+        var KeyValue = document.getElementById("keyId").value;
+        var UiD = new Date().getTime();
+        const regex = new RegExp('OK');
+
+        $.ajax({
+            type: 'POST',
+            url: '/Home/_SubShiftsEdit',
+            data: { SubGroupId: subGroupId, SubDayId: daysId, SubShiftId: shiftsId, SubName: NameValue, SubType: TypeValue, SubStartTime: StartTimeValue, SubEndTime: EndTimeValue, SubStaffNeeds: StaffNeedsValue, Key: KeyValue }
+        }).done(function (returned) {
+            shiftsUpdate(subGroupId);
+            needsUpdate(subGroupId);
+            PlaceHolderElement.find('.modal').modal('hide');
+
+            if (regex.test(returned) == true) {
+                document.getElementById("AlertPlaceholder").innerHTML = "<div class=\"alert alert-success d-flex align-items-center bs-popover-start\" role=\"alert\">" +
+                    "<table width=\"100%\">" +
+                        "<tr>" +
+                            "<td align=\"left\" valign=\"middle\" style=\"font-size: 16px;\">" +
+                                "<i class=\"bi bi-check-circle\"></i>&nbsp;&nbsp;" +
+                                "Gemt" +
+                            "</td>" +
+                            "<td align=\"right\" valign=\"middle\">" +
+                                "<button type=\"button\" id=\"" + UiD + "\" class=\"btn-close\" data-bs-dismiss=\"alert\" title=\"Luk\"></button>" +
+                            "</td>" +
+                        "</tr>" +
+                    "</table>" +
+                    "<script type=\"text/javascript\">" +
+                        "setTimeout(function () {" +
+                            "document.getElementById('" + UiD + "').click();" +
+                        "}, 3000);" +
+                    "<\/script>" +
+                "</div>";
+            } else {
+                document.getElementById("AlertPlaceholder").innerHTML = "<div class=\"alert alert-danger d-flex align-items-center bs-popover-start\" role=\"alert\">" +
+                    "<table width=\"100%\">" +
+                        "<tr>" +
+                            "<td align=\"left\" valign=\"middle\" style=\"font-size: 16px;\">" +
+                    "<i class=\"bi bi-exclamation-diamond\"></i>&nbsp;&nbsp;" +
+                                returned +
+                            "</td>" +
+                            "<td align=\"right\" valign=\"middle\">" +
+                                "<button type=\"button\" id=\"" + UiD + "\" class=\"btn-close\" data-bs-dismiss=\"alert\" title=\"Luk\"></button>" +
+                            "</td>" +
+                        "</tr>" +
+                    "</table>" +
+                "</div>";
+            }
+        });
+    }
+
+</script>

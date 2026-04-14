@@ -1,0 +1,53 @@
+﻿@model ShiftHub.Models.HomeModels
+
+<div class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Opret Post</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="Name">Navn</label>
+                    <input name="Name" onkeyup="vCreate()" onchange="vCreate()" class="form-control" id="NameId" />
+                </div>
+                <hr />
+                <div class="form-group">
+                    <label for="MaxTime">Max tid (Minutter)</label>
+                    <input name="MaxTime" type="number" min="0" max="1440" value="" class="form-control" id="MaxTimeId" />
+                    <span validation-for="MaxTime" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="CreatePost()" id="CreateId" disabled>Opret</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Luk</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function vCreate() {
+        if (document.getElementById("NameId").value != '') {
+            document.getElementById("CreateId").disabled = false;
+        } else {
+            document.getElementById("CreateId").disabled = true;
+        }
+    }
+    function CreatePost() {
+        var PlaceHolderElement = $('#PopUpPlaceholder');
+        var subGroupId = document.getElementById("SubGroupValue").value;
+        
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_SubPostSave",
+            data: { SubGroupId: subGroupId, Name: document.getElementById("NameId").value, MaxTime: document.getElementById("MaxTimeId").value }
+        }).done(function (returned) {
+            updateOverview();
+            PlaceHolderElement.find('.modal').modal('hide');
+        });
+    }
+
+</script>

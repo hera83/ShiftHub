@@ -1,0 +1,64 @@
+﻿@model ShiftHub.Models.HomeModels
+
+<div class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Rediger bruger</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <form action="EditUser" method="post">
+                    <input type="hidden" asp-for="User.UserId" />
+
+                    <div class="form-group">
+                        <label asp-for="User.Username">Brugernavn</label>
+                        <input asp-for="User.Username" class="form-control" readonly />
+                        <span asp-validation-for="User.Username" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="User.Password">Adgangskode</label>
+                        <input type="password" asp-for="User.Password" class="form-control" id="PasswordId" />
+                        <span asp-validation-for="User.Password" class="text-danger"></span>
+                    </div>
+                    <hr />
+                    <div class="form-group">
+                        <label asp-for="User.DisplayName">Fuldenavn</label>
+                        <input asp-for="User.DisplayName" onchange="vSave()" class="form-control" id="DisplayNameId" />
+                        <span asp-validation-for="User.DisplayName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="User.Mail">Mail</label>
+                        <input type="email" asp-for="User.Mail" class="form-control" />
+                        <span asp-validation-for="User.Mail" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="User.Phone">Telefon Nr</label>
+                        <input asp-for="User.Phone" class="form-control" />
+                        <span asp-validation-for="User.Phone" class="text-danger"></span>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-save="modal" id="AddId">Gem</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Luk</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function vSave() {
+        var GroupIdValue = document.getElementById("GroupIdId").value;
+        var DisplayNameValue = document.getElementById("DisplayNameId").value;
+
+        if (GroupIdValue != "" && DisplayNameValue != "") {
+            document.getElementById("AddId").disabled = false;
+        } else {
+            document.getElementById("AddId").disabled = true;
+        }
+    }
+
+</script>

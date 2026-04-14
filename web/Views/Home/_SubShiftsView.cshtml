@@ -1,0 +1,110 @@
+﻿@model ShiftHub.Models.HomeModels
+
+<div class="modal fade">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Oversigt</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <canvas id="myChart"></canvas>
+                <div class="form-group">
+                    <label for="Days">Dag</label>
+                    <select name="Days" onchange="ShowDetails(this)" class="form-control" id="subShiftDays"></select>
+                    <span validation-for="Days" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Luk</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var runOnStart = UpdateDays();
+
+    function UpdateDays() {
+        var SubGroupId = document.getElementById("SubGroupValue").value;
+
+        $.ajax({
+            url: '/Home/_SubShiftsViewGetDays',
+            data: { SubGroupId: SubGroupId }
+        }).done(function (returned) {
+            var dataObj = JSON.parse(returned);
+            var options = '<option></option>';
+
+            for (let i = 0; i < dataObj.length; i++) {
+                options += '<option value=\"' + dataObj[i].Date + '\">' + dataObj[i].Date + ' (' + dataObj[i].WeekDay + ')</option>';
+            }
+
+            document.getElementById("subShiftDays").innerHTML = options;
+        });
+    }
+    function ShowDetails(element) {
+        var SubGroupId = document.getElementById("SubGroupValue").value;
+
+        if (element.value == '') {
+            document.getElementById("chartId").innerHTML = "";
+        } else {
+            $.ajax({
+                url: '/Home/_SubShiftsViewGetDetails',
+                data: { SubGroupId: SubGroupId, Date: element.value }
+            }).done(function (returned) {
+                var dataObj = JSON.parse(returned);
+                
+                var chart = new Chart("myChart", {
+                    type: 'bar',
+                    data: {
+                        labels: dataObj.labels,
+                        datasets: [{
+                            data: dataObj.data,
+                            backgroundColor: '#aebfd1'
+                        }]
+                    },
+                    options: {
+                        events: false,
+                        tooltips: {
+                            enabled: false
+                        },
+                        hover: {
+                            animationDuration: 0
+                        },
+                        animation: {
+                            duration: 1,
+                            onComplete: function () {
+                                var chartInstance = this.chart,
+                                    ctx = chartInstance.ctx;
+                                ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
+                                ctx.textAlign = 'center';
+                                ctx.textBaseline = 'bottom';
+
+                                this.data.datasets.forEach(function (dataset, i) {
+                                    var meta = chartInstance.controller.getDatasetMeta(i);
+                                    meta.data.forEach(function (bar, index) {
+                                        var data = dataset.data[index];
+                                        ctx.fillText(data, bar._model.x, bar._model.y - 5);
+                                    });
+                                });
+                            }
+                        },
+                        legend: {
+                            display: false
+                        },
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true,
+                                    stepSize: 1
+                                }
+                            }]
+                        }
+                    }
+                });
+            });
+        }
+    }
+
+</script>

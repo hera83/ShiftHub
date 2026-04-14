@@ -1,0 +1,111 @@
+﻿@model ShiftHub.Models.HomeModels
+
+<div class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">CheckIn</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <table width="100%">
+                    <tr>
+                        <td width="48%" align="left" valign="top">
+                            <div class="form-group">
+                                <label for="Post">Post (CheckIn)</label>
+                                <select class="form-control" id="PostId"></select>
+                                <span validation-for="Post" class="text-danger"></span>
+                            </div>
+                            <hr />
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" onkeyup="GetStaffSearch()" onchange="GetStaffSearch()" placeholder="Søg her" id="searchId">
+                                <button class="btn btn-outline-secondary" type="button">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+                            <hr />
+                            <div id="SearchView"></div>
+                        </td>
+                        <td width="4%"></td>
+                        <td width="48%" align="left" valign="top">
+                            <center><h5 title="Top 10 inden for +- 60 min for møde tid.">Quick List</h5></center>
+                            <hr />
+                            <div id="ListView">
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Luk</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    GetPosts();
+    GetList();
+
+    function GetPosts() {
+        var subGroupId = document.getElementById("SubGroupValue").value;
+
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_SubPostGetPosts",
+            data: { SubGroupId: subGroupId }
+        }).done(function (returned) {
+            if (returned != '') {
+                document.getElementById("PostId").innerHTML = returned;
+            }
+        });
+    }
+    function GetList() {
+        var subGroupId = document.getElementById("SubGroupValue").value;
+
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_SubPostGetList",
+            data: { SubGroupId: subGroupId }
+        }).done(function (returned) {
+            document.getElementById("ListView").innerHTML = returned;
+        });
+    }
+    function GetStaffSearch() {
+        var subGroupId = document.getElementById("SubGroupValue").value;
+        var SearchValue = document.getElementById("searchId").value;
+
+        if (SearchValue != '') {
+            $.ajax({
+                type: 'POST',
+                url: "/Home/_SubPostGetStaffSearch",
+                data: { SubGroupId: subGroupId, Filter: SearchValue }
+            }).done(function (returned) {
+                document.getElementById("SearchView").innerHTML = returned;
+            });
+        } else {
+            document.getElementById("SearchView").innerHTML = '';
+        }
+    }
+
+    function CheckIn(staffId) {
+        var subGroupId = document.getElementById("SubGroupValue").value;
+
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_SubPostCheckIn",
+            data: { SubGroupId: subGroupId, PostId: document.getElementById("PostId").value, StaffId: staffId }
+        }).done(function (returned) {
+            GetList();
+            GetStaffSearch();
+
+            updateOverview();
+
+            document.getElementById("ListValue").value = "1";
+            list();
+        });
+    }
+
+</script>

@@ -1,0 +1,52 @@
+﻿@model ShiftHub.Models.HomeModels
+
+<div class="modal fade">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content" style="height: 90vh;">
+            <div class="modal-header">
+                <h4 class="modal-title">@Model.MessageView.Subject</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                @if (System.Text.RegularExpressions.Regex.IsMatch(Model.MessageView.Message, @"^<html>") == true)
+                {
+                    <div style="width: 100%; height: 100%;">@Html.Raw(Model.MessageView.Message)</div>
+                }
+                else
+                {
+                    <textarea style="width: 100%; height: 100%; border: none;" readonly>@Model.MessageView.Message</textarea>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var runOnLoad = CheckMessage();
+
+    function CheckMessage() {
+        var SubGroupId = '@Html.Raw(Model.MessageView.SubGroupId)';
+        var MessageId = '@Html.Raw(Model.MessageView.MessageId)';
+        var State = '@Html.Raw(Model.MessageView.State)';
+        
+        if (State == '0') {
+            let MainMessageCount = document.getElementById(SubGroupId + "_MainMessageCount").innerHTML;
+            let MenuMessageCount = document.getElementById("messagesMenuId").innerHTML;
+
+            if (MainMessageCount == 1) {
+                document.getElementById(SubGroupId + "_MainMessageCount").innerHTML = '';
+            } else {
+                document.getElementById(SubGroupId + "_MainMessageCount").innerHTML = MainMessageCount - 1;
+            }
+            if (MenuMessageCount == 1) {
+                document.getElementById("messagesMenuId").innerHTML = '';
+            } else {
+                document.getElementById("messagesMenuId").innerHTML = MenuMessageCount - 1;
+            }
+
+            document.getElementById(MessageId + '_Icon').innerHTML = '<i class=\"bi bi-envelope-open\" style=\"font-size: 1.2rem; color: gray;\"></i>';
+        }
+    }
+
+</script>

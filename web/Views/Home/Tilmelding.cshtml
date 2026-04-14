@@ -1,0 +1,405 @@
+﻿@model ShiftHub.Models.HomeModels
+@{
+    ViewData["Title"] = "Tilmelding";
+}
+
+<style>
+    .RuleFailed {
+        color: lightcoral !important;
+    }
+    .RulePassed {
+        color: green;
+    }
+
+</style>
+
+<div class="container">
+    <table width="100%">
+        <tr>
+            <td align="center" valign="top">
+                @switch(Convert.ToInt32($"{Model.SubForm.Activated}"))
+                {
+                    case 2:
+                        {   
+                            <!-- Bruger har allerede meldt vagter ind -->
+                            <table width="400">
+                                <tr>
+                                    <td colspan="3" align="center" valign="middle">
+                                        <h3>@Html.Raw($"{Model.Data.aTable.Rows[0]["Name"]}")</h3>
+                                    </td>
+                                </tr>
+                                
+                                <tr><td colspan="3" height="20"></td></tr>
+
+                                <tr>
+                                    <td colspan="3" align="center" valign="middle">
+                                        <i>Du har meldt timer ind.</i>
+                                    </td>
+                                </tr>
+
+                                <tr><td colspan="3" height="20"></td></tr>
+
+                                <tr>
+                                    <td colspan="3" align="left" valign="middle" height="40px">
+                                        <h5 style="text-decoration: underline;">Kontaktoplysninger</h5>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="left" valign="middle">
+                                        <b>Navn: </b>
+                                    </td>
+                                    <td width="5px"></td>
+                                    <td align="left" valign="middle">
+                                        <input type="text" class="form-control form-control-sm" asp-for="Tilmelding.Name" onkeydown="UpdateStaffButton()" id="staffName" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="left" valign="middle">
+                                        <b>Telefon: </b>
+                                    </td>
+                                    <td width="5px"></td>
+                                    <td align="left" valign="middle" title="Mobil nummer anbefales da der kan komme smser med informationer">
+                                        <input type="text" class="form-control form-control-sm" asp-for="Tilmelding.Phone" onkeydown="UpdateStaffButton()" id="staffPhone" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="left" valign="middle">
+                                        <b>Mail: </b>
+                                    </td>
+                                    <td width="5px"></td>
+                                    <td align="left" valign="middle">
+                                        <input type="text" class="form-control form-control-sm" asp-for="Tilmelding.Mail" onkeydown="UpdateStaffButton()" id="staffMail" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" align="center" valign="middle" style="padding: 10px 0px 0px 0px;">
+                                        <button type="button" class="btn btn-outline-success btn-sm" onclick="UpdateStaff()" style="width: 100%;"><i class="bi bi-check-circle" id="staffSaved" style="display: none;"> Gemt</i><div id="staffSave" style="display: block;">Gem</div></button>
+                                    </td>
+                                </tr>
+                            </table>
+                            break;
+                        }
+                    case 1:
+                        {
+                            <!-- Aktiv -->
+                            <table width="100%">
+                                <tr>
+                                    <td colspan="2" align="center" valign="middle">
+                                        <h3>@Html.Raw($"{Model.Data.aTable.Rows[0]["Name"]}")</h3>
+                                    </td>
+                                </tr>
+                                <tr><td colspan="2" height="20"></td></tr>
+                                <tr>
+                                    <td align="center" valign="top" width="50%">
+                                        <!-- Tilmelding & Kontakt Oplysninger -->
+                                        <table width="400">
+                                            <tr>
+                                                <td colspan="3" align="left" valign="middle" height="40px">
+                                                    <h5 style="text-decoration: underline;">Vagter</h5>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3">
+                                                    @foreach (System.Data.DataRow cRow in Model.Data.cTable.Rows)
+                                                    {
+                                                        @if ($"{cRow["Type"]}" == "Fixed")
+                                                        {
+                                                            @if (Model.Data.cTable.Rows.IndexOf(cRow) == 0)
+                                                            {
+                                                                @Html.Raw($"<div class=\"form-group\"><label for=\"{cRow["WeekDay"]}\">{cRow["WeekDay"]}</label><select name=\"{cRow["WeekDay"]}\" class=\"form-control shiftElement shiftChoice\" onchange=\"UpdateOverview()\"><option></option>")
+                                                            }
+                                                            else if ($"{cRow["WeekDay"]}" != $"{Model.Data.cTable.Rows[(Model.Data.cTable.Rows.IndexOf(cRow) - 1)]["WeekDay"]}")
+                                                            {
+                                                                @Html.Raw($"</select></div>")
+                                                                @Html.Raw($"<div class=\"form-group\"><label for=\"{cRow["WeekDay"]}\">{cRow["WeekDay"]}</label><select name=\"{cRow["WeekDay"]}\" class=\"form-control shiftElement shiftChoice\" onchange=\"UpdateOverview()\"><option></option>")
+                                                            }
+
+                                                            @Html.Raw($"<option title=\"{Convert.ToDateTime($"{cRow["SubStartTime"]}").ToString("yyyy-MM-dd HH:mm")} til {Convert.ToDateTime($"{cRow["SubEndTime"]}").AddMinutes(1).ToString("yyyy-MM-dd HH:mm")}\" value=\"{cRow["ShiftId"]}\" ") @if (Convert.ToInt32($"{cRow["StaffNeeds"]}") <= 0) { @Html.Raw($"disabled") } @Html.Raw($">{cRow["Name"]} ({Convert.ToDateTime($"{cRow["SubStartTime"]}").ToString("HH:mm")} - {Convert.ToDateTime($"{cRow["SubEndTime"]}").AddMinutes(1).ToString("HH:mm")})</option>")
+
+                                                            @if ((Model.Data.cTable.Rows.IndexOf(cRow) + 1) == Model.Data.cTable.Rows.Count)
+                                                            {
+                                                                @Html.Raw($"</select></div>")
+                                                            }
+                                                        }
+                                                    }
+                                                    <div class="form-group">
+                                                        <label for="note">note</label>
+                                                        <textarea name="note" class="form-control shiftElement" rows="3"></textarea>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3">
+                                                    @foreach (System.Data.DataRow cRow in Model.Data.cTable.Rows)
+                                                    {
+                                                        @if ($"{cRow["Type"]}" == "Flex")
+                                                        {
+                                                            //-> Ikke lavet i nu
+                                                        }
+                                                    }
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3" align="center" valign="middle" style="padding: 10px 0px 0px 0px;">
+                                                    <button type="button" class="btn btn-outline-success btn-sm" onclick="SaveShift()" style="width: 100%;" id="shiftsSubmitId" disabled><i class="bi bi-check-circle" id="shiftSaved" style="display: none;"> Gemt</i><div id="shiftSave" style="display: block;">Gem</div></button>
+                                                </td>
+                                            </tr>
+
+                                            <tr><td colspan="3" height="20"></td></tr>
+
+                                            <tr>
+                                                <td colspan="3" align="left" valign="middle" height="40px">
+                                                    <h5 style="text-decoration: underline;">Kontaktoplysninger</h5>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left" valign="middle">
+                                                    <b>Navn: </b>
+                                                </td>
+                                                <td width="5px"></td>
+                                                <td align="left" valign="middle">
+                                                    <input type="text" class="form-control form-control-sm" asp-for="Tilmelding.Name" onkeydown="UpdateStaffButton()" id="staffName" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left" valign="middle">
+                                                    <b>Telefon: </b>
+                                                </td>
+                                                <td width="5px"></td>
+                                                <td align="left" valign="middle" title="Mobil nummer anbefales da der kan komme smser med informationer">
+                                                    <input type="text" class="form-control form-control-sm" asp-for="Tilmelding.Phone" onkeydown="UpdateStaffButton()" id="staffPhone" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left" valign="middle">
+                                                    <b>Mail: </b>
+                                                </td>
+                                                <td width="5px"></td>
+                                                <td align="left" valign="middle">
+                                                    <input type="text" class="form-control form-control-sm" asp-for="Tilmelding.Mail" onkeydown="UpdateStaffButton()" id="staffMail" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3" align="center" valign="middle" style="padding: 10px 0px 0px 0px;">
+                                                    <button type="button" class="btn btn-outline-success btn-sm" onclick="UpdateStaff()" style="width: 100%;"><i class="bi bi-check-circle" id="staffSaved" style="display: none;"> Gemt</i><div id="staffSave" style="display: block;">Gem</div></button>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td align="center" valign="top" width="50%">
+                                        <!-- Overblik & Tilmeldingsregler -->
+                                        <table width="400">
+                                            <tr>
+                                                <td align="left" valign="middle" height="40px">
+                                                    <h5 style="text-decoration: underline;">Overblik</h5>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="center" valign="middle">
+                                                    <input class="form-control" value="Vagter valgt: 0" style="color: green;" id="shiftOverview" readonly />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="center" valign="middle">
+                                                    <input class="form-control" value="Total timer: 0" style="color: green;" id="shiftHours" readonly />
+                                                </td>
+                                            </tr>
+
+                                            <tr><td colspan="3" height="20"></td></tr>
+
+                                            <tr>
+                                                <td align="left" valign="middle" height="40px">
+                                                    <h5 style="text-decoration: underline;">Regler</h5>
+                                                </td>
+                                            </tr>
+                                            @foreach (System.Data.DataRow eRow in Model.Data.eTable.Rows)
+                                            {
+                                                @switch ($"{eRow["Rule"]}")
+                                                {
+                                                    case "NeedsRuleWeekend":
+                                                        <tr>
+                                                            <td align="center" valign="middle">
+                                                                <input class="form-control RuleFailed" id="needsRuleWeekend_Element" value="Minimum @Html.Raw($"{eRow["Value"]}") lørdag(e) eller søndag(e)" readonly />
+                                                            </td>
+                                                        </tr>
+                                                        break;
+                                                    case "NeedsRuleHours":
+                                                        <tr>
+                                                            <td align="center" valign="middle">
+                                                                <input class="form-control RuleFailed" id="needsRuleHours_Element" value="Minimum @Html.Raw($"{eRow["Value"]}") time(r) skal vælges" readonly />
+                                                            </td>
+                                                        </tr>
+                                                        break;
+                                                }
+                                            }
+                                            @foreach (NeedsRuleKeysModel RuleKey in Model.NeedsRuleKeys)
+                                            {
+                                                <tr>
+                                                    <td align="center" valign="middle">
+                                                        <input class="form-control RuleFailed" id="@Html.Raw($"{RuleKey.Key}")" value="@Html.Raw($"{RuleKey.Amount} x {RuleKey.Title}")" readonly />
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                            break;
+                        }
+                    case 0:
+                        {
+                            <!-- Pasiv -->
+                            <center><h3>Tilmeldingen er ikke aktiv</h3></center>
+                            break;
+                        }
+
+                    default:
+                        {
+                            <!-- Link er ikke gyldigt -->
+                            <center><h3>Linket er ikke gyldigt?</h3></center>
+                            break;
+                        }
+                }
+            </td>
+        </tr>
+    </table>
+</div>
+<script type="text/javascript">
+    function UpdateOverview() {
+        const choices = document.getElementsByClassName("shiftChoice");
+        const shiftsSelected = [];
+        let shifts = 0;
+
+        /* Count Shifts */
+        if (choices != null) {
+            for (let i = 0; i < choices.length; i++) {
+                if (choices[i].value != '') {
+                    shiftsSelected[shifts] = choices[i].value;
+                    shifts++;
+                }
+            }
+        }
+        document.getElementById("shiftOverview").value = "Vagter valgt: " + shifts;
+        
+        /* Count Hours on selected Shifts */
+        if (shifts > 0) {
+            $.ajax({
+                url: "/Home/_TilmeldingCheck",
+                data: { Shifts: JSON.stringify(shiftsSelected) },
+            }).done(function (returned) {
+                var dataObj = JSON.parse(returned);
+                
+                document.getElementById("shiftHours").value = "Total timer: " + dataObj[0].HoursCount;
+                
+                if (dataObj[0].Hours != 0) {
+                    if (dataObj[0].HoursCount >= dataObj[0].Hours) {
+                        document.getElementById("needsRuleHours_Element").classList.add("RulePassed");
+                        document.getElementById("needsRuleHours_Element").classList.remove("RuleFailed");
+                    } else {
+                        document.getElementById("needsRuleHours_Element").classList.add("RuleFailed");
+                        document.getElementById("needsRuleHours_Element").classList.remove("RulePassed");
+                    }
+                }
+                
+                if (dataObj[0].Weekend != 0) {
+                    if (dataObj[0].WeekendCount >= dataObj[0].Weekend) {
+                        document.getElementById("needsRuleWeekend_Element").classList.add("RulePassed");
+                        document.getElementById("needsRuleWeekend_Element").classList.remove("RuleFailed");
+                    } else {
+                        document.getElementById("needsRuleWeekend_Element").classList.add("RuleFailed");
+                        document.getElementById("needsRuleWeekend_Element").classList.remove("RulePassed");
+                    }
+                }
+                
+                if (dataObj[0].RuleKeys.length != 0) {
+                    for (let i = 0; i < dataObj[0].RuleKeys.length; i++) {
+                        if (dataObj[0].RuleKeys[i].AmountCount >= dataObj[0].RuleKeys[i].Amount) {
+                            document.getElementById(dataObj[0].RuleKeys[i].Key).classList.add("RulePassed");
+                            document.getElementById(dataObj[0].RuleKeys[i].Key).classList.remove("RuleFailed");
+                        } else {
+                            document.getElementById(dataObj[0].RuleKeys[i].Key).classList.add("RuleFailed");
+                            document.getElementById(dataObj[0].RuleKeys[i].Key).classList.remove("RulePassed");
+                        }
+                    }
+                }
+                
+                if (dataObj[0].PassValidation == 1) {
+                    document.getElementById("shiftsSubmitId").disabled = false;
+                } else {
+                    document.getElementById("shiftsSubmitId").disabled = true;
+                }
+            });
+        } else {
+            var RuleElements = document.getElementsByClassName("RulePassed");
+            
+            if (RuleElements != null) {
+                for (let i = 0; i < RuleElements.length; i++) {
+                    RuleElements[i].classList.add("RuleFailed");
+                }
+            }
+
+            document.getElementById("shiftHours").value = "Total timer: 0";
+            document.getElementById("shiftsSubmitId").disabled = true;
+        }
+    }
+    function UpdateStaff() {
+        var name = document.getElementById("staffName").value;
+        var phone = document.getElementById("staffPhone").value;
+        var mail = document.getElementById("staffMail").value;
+
+        if (name != '' && mail != '') {
+            document.getElementById("staffSave").style = "display: block;";
+            document.getElementById("staffSaved").style = "display: none;";
+
+            $.ajax({
+                url: "/Home/_TilUpdateStaff",
+                data: { Staff: '@Html.Raw($"{Model.SubForm.Staff}")', Name: name, Phone: phone, Mail: mail },
+            }).done(function (returned) {
+                document.getElementById("staffSave").style = "display: none;";
+                document.getElementById("staffSaved").style = "display: block;";
+            });
+        } else {
+            document.getElementById("staffSave").style = "display: block;";
+            document.getElementById("staffSaved").style = "display: none;";
+        }
+    }
+    function UpdateStaffButton() {
+        document.getElementById("staffSave").style = "display: block;";
+        document.getElementById("staffSaved").style = "display: none;";
+    }
+    function SaveShift() {
+        var ShiftElements = document.getElementsByClassName("shiftElement");
+        var note = '';
+        const choices = document.getElementsByClassName("shiftChoice");
+        const shiftsSelected = [];
+        let shifts = 0;
+
+        /* Count Shifts */
+        for (let i = 0; i < choices.length; i++) {
+            if (choices[i].value != '') {
+                shiftsSelected[shifts] = choices[i].value;
+                shifts++;
+            }
+        }
+        console.log(ShiftElements);
+        /* Deactivate Form */
+        for (let i = 0; i < ShiftElements.length; i++) {
+            ShiftElements[i].disabled = true;
+
+            if (ShiftElements[i].localName == "textarea") {
+                note = ShiftElements[i].value;
+            }
+        }
+        document.getElementById("shiftsSubmitId").disabled = true;
+
+        $.ajax({
+            url: "/Home/_TilmeldingSave",
+            data: { Staff: '@Html.Raw($"{Model.SubForm.Staff}")', Shifts: JSON.stringify(shiftsSelected), ShiftNote: note },
+            dataType: "text"
+        }).done(function (returned) {
+            document.getElementById("shiftSave").style = "display: none;";
+            document.getElementById("shiftSaved").style = "display: block;";
+        });
+    }
+
+</script>

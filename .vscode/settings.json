@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "dotnet build": true,
+        "dotnet tool": true,
+        "New-Item": true
+    },
+    "dotnet.defaultSolution": "ShiftHub.sln"
+}

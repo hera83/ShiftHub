@@ -1,0 +1,101 @@
+﻿@model ShiftHub.Models.HomeModels
+@{
+    /// Title
+    ViewData["Title"] = "Brugere";
+
+    /// Messages
+    foreach (ShiftHub.Models.MessageModel.Message item in Model.Messages.aList)
+    {
+        <div class="alert alert-@item.Type.ToString().ToLower() d-flex align-items-center bs-popover-start" role="alert">
+            <table width="100%">
+                <tr>
+                    <td align="left" valign="middle" style="font-size: 16px;">
+                        @switch (item.Type.ToString())
+                        {
+                            case "Info":
+                                <i class="bi bi-info-circle"></i>
+                                break;
+                            case "Success":
+                                <i class="bi bi-check-circle"></i>
+                                break;
+                            case "Warning":
+                                <i class="bi bi-exclamation-circle"></i>
+
+                                break;
+                            case "Danger":
+                                <i class="bi bi-exclamation-diamond"></i>
+                                break;
+                        }
+                        @item.Content
+                    </td>
+                    <td align="right" valign="middle">
+                        <button type="button" id="@item.UiD" class="btn-close" data-bs-dismiss="alert" title="Luk"></button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        @if (item.Type.ToString() != "Danger")
+        {
+            <script type="text/javascript">
+                setTimeout(function () {
+                    document.getElementById('@item.UiD').click();
+                }, @item.AutoClose);
+            </script>
+        }
+    }
+}
+
+<div id="PopUpPlaceholder"></div>
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h5><i class="bi bi-people"> Brugere</i></h5>
+            <hr />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <button type="button" class="btn lightButton" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("AddStaff", "Home", new { })" title="Opret bruger">
+                <i class="bi bi-person-add" style="font-size: 1.2rem; color: gray;"></i>
+            </button>
+            <button type="button" class="btn lightButton" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("InportStaff", "Home", new { })" title="Inport brugere">
+                <i class="bi bi-database-up" style="font-size: 1.2rem; color: gray;"></i>
+            </button>
+            <a href="/Home/ExportStaff" class="btn lightButton" title="Export brugere" download>
+                <i class="bi bi-database-down" style="font-size: 1.2rem; color: gray;"></i>
+            </a>
+        </div>
+        <div class="col" align="right">
+            <input class="form-control" type="text" id="staffFilterId" placeholder="Søg" onkeyup="staffUpdate()" style="width: 180px;" />
+        </div>
+    </div>
+    <table class="table" id="StaffList">
+    </table>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script type="text/javascript">
+    staffUpdate();
+
+    function staffUpdate() {
+        $.ajax({
+            type: "POST",
+            url: "/Home/_StaffUpdate",
+            data: { FilterValue: document.getElementById("staffFilterId").value }
+        }).done(function (returned) {
+            document.getElementById("StaffList").innerHTML = returned;
+
+            var PlaceHolderElement = $('#PopUpPlaceholder');
+
+            $('button[data-bs-toggle="staffUpdate-ajax-modal"]').click(function (event) {
+                var url = $(this).data('bs-url');
+                $.get(url).done(function (data) {
+                    PlaceHolderElement.html(data);
+                    PlaceHolderElement.find('.modal').modal('show');
+                })
+            })
+        });
+    }
+    
+</script>

@@ -1,0 +1,58 @@
+﻿@model ShiftHub.Models.HomeModels
+
+<div class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">@Html.Raw($"{Model.Data.aTable.Rows[0]["Name"]}") - Time detaljer</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <table class="table">
+                    <tr>
+                        <th>
+                            Dag
+                        </th>
+                        <th>
+                            Sted
+                        </th>
+                        <th>
+                            CheckIn
+                        </th>
+                        <th>
+                            CheckOut
+                        </th>
+                        <th>
+                            Minutter
+                        </th>
+                    </tr>
+                    @foreach (System.Data.DataRow bRow in Model.Data.bTable.Rows)
+                    {
+                        <tr>
+                            <td>
+                                @Convert.ToDateTime($"{bRow["Date"]}").ToString("dd-MMM - dddd")
+                            </td>
+                            <td>
+                                @Html.Raw($"{bRow["PostName"]}")
+                            </td>
+                            <td>
+                                @Convert.ToDateTime($"{bRow["CheckInTime"]}").ToString("HH:mm ")
+                            </td>
+                            <td>
+                                @Convert.ToDateTime($"{bRow["CheckOutTime"]}").ToString("HH:mm ")
+                            </td>
+                            <td>
+                                @Html.Raw($"{bRow["Min"]}")
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Luk</button>
+            </div>
+        </div>
+    </div>
+</div>

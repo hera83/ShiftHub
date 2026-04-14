@@ -1,0 +1,91 @@
+﻿@model ShiftHub.Models.HomeModels
+
+<div class="modal fade">
+    <div class="modal-dialog model-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Tilføj brugere</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <form action="SubStaffAdd" method="post">
+                    <input type="hidden" asp-for="SubGroups.SubGroupId" />
+
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" onkeyup="staffSearch(this)" placeholder="Søg her" id="searchId">
+                        <button class="btn btn-outline-secondary" type="button">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </form>
+                <table id="SearchContent" style="width: 100%;">
+                </table>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning btn-primary" onclick="staffAddBulk()">Fremsøgte</button>
+                <button type="button" class="btn btn-warning btn-primary" onclick="staffAddAll()">Alle</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Luk</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function staffSearch(searchValue) {
+        var subGroupId = document.getElementById("SubGroupValue").value;
+        
+        if (searchValue.value != "") {
+            $.ajax({
+                type: 'POST',
+                url: "/Home/_SubStaffSearch",
+                data: { SubGroupId: subGroupId, SearchValue: searchValue.value }
+            }).done(function (returned) {
+                document.getElementById("SearchContent").innerHTML = "<tr><td><hr/></td></tr>" + returned;
+            });
+        } else {
+            document.getElementById("SearchContent").innerHTML = "";
+        }
+    }
+    function staffAdd(id) {
+        var subGroupId = document.getElementById("SubGroupValue").value;
+        var staffId = document.getElementById("staffId_" + id).value;
+
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_SubStaffAdd",
+            data: { SubGroupId: subGroupId, StaffId: staffId }
+        }).done(function (returned) {
+            staffUpdate(subGroupId);
+            document.getElementById("row_" + id).remove();
+        });
+    }
+    function staffAddBulk() {
+        var subGroupId = document.getElementById("SubGroupValue").value;
+        var searchValue = document.getElementById("searchId").value;
+
+        if (searchValue != "") {
+            $.ajax({
+                type: 'POST',
+                url: "/Home/_SubStaffAddBulk",
+                data: { SubGroupId: subGroupId, SearchValue: searchValue }
+            }).done(function (returned) {
+                staffUpdate(subGroupId);
+                document.getElementById("SearchContent").innerHTML = "";
+            });
+        }
+    }
+    function staffAddAll() {
+        var subGroupId = document.getElementById("SubGroupValue").value;
+
+        $.ajax({
+            type: 'POST',
+            url: "/Home/_SubStaffAddAll",
+            data: { SubGroupId: subGroupId }
+        }).done(function (returned) {
+            staffUpdate(subGroupId);
+            document.getElementById("SearchContent").innerHTML = "";
+        });
+    }
+
+</script>

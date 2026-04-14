@@ -1,0 +1,74 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+/* Custom */
+.light:hover {
+    border-radius: 5px;
+    background-color: #f2f2f2;
+}
+.lightButton:hover {
+    border-radius: 5px;
+    background-color: #e6f5ff;
+    border: 1px solid black;
+}
+
+.nav-link {
+    color: black;
+}
+
+    .nav-link:hover {
+        color: black;
+    }
+
+.SubGroupSelected {
+    background-color: lightgray !important;
+}
+
+.nav-custom-dropdown {
+    text-align: center;
+    width: 5px;
+}
+.bi-three-dots-vertical:hover {
+    padding: 7px 0px 7px 0px;
+    outline: 1px solid gray;
+    outline-offset: -1px;
+    border-radius: 5px;
+    border-color: lightgray;
+    background-color: #f2f2f2;
+}
+
+.dropdown-menu li {
+    position: relative;
+}
+
+.dropdown-menu .dropdown-submenu {
+    display: none;
+    position: absolute;
+    left: 100%;
+    top: -7px;
+}
+
+.dropdown-menu .dropdown-submenu-left {
+    right: 100%;
+    left: auto;
+}
+
+.dropdown-menu > li:hover > .dropdown-submenu {
+    display: block;
+}

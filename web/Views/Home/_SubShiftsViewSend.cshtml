@@ -1,0 +1,82 @@
+﻿@model ShiftHub.Models.HomeModels
+
+<div class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Send tilmeldingsmail</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                Send tilmeldingsblanket til brugeren?
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" onclick="SendMail()" id="sendId">Send</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Luk</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var runOnStart = SendCheck();
+
+    function SendCheck() {
+        var mail = '@Html.Raw($"{Model.Staff.Mail}")';
+
+        if (mail == '') {
+            document.getElementById("sendId").disabled = true;
+        }
+    }
+    function SendMail() {
+        var PlaceHolderElement = $('#PopUpPlaceholder');
+        var SubGroupId = document.getElementById("SubGroupValue").value;
+        var UiD = new Date().getTime();
+        const regex = new RegExp('OK');
+
+        $.ajax({
+            url: "/Home/_SubShiftsViewSendConfirm",
+            data: { SubGroupId: SubGroupId, StaffId: '@Html.Raw($"{Model.Staff.StaffId}")' },
+            dataType: "text"
+        }).done(function (returned) {
+            PlaceHolderElement.find('.modal').modal('hide');
+
+            if (regex.test(returned) == true) {
+                document.getElementById("AlertPlaceholder").innerHTML = "<div class=\"alert alert-success d-flex align-items-center bs-popover-start\" role=\"alert\">" +
+                    "<table width=\"100%\">" +
+                        "<tr>" +
+                            "<td align=\"left\" valign=\"middle\" style=\"font-size: 16px;\">" +
+                                "<i class=\"bi bi-check-circle\"></i>&nbsp;&nbsp;" +
+                                "Sendt" +
+                            "</td>" +
+                            "<td align=\"right\" valign=\"middle\">" +
+                                "<button type=\"button\" id=\"" + UiD + "\" class=\"btn-close\" data-bs-dismiss=\"alert\" title=\"Luk\"></button>" +
+                            "</td>" +
+                        "</tr>" +
+                    "</table>" +
+                    "<script type=\"text/javascript\">" +
+                        "setTimeout(function () {" +
+                            "document.getElementById('" + UiD + "').click();" +
+                        "}, 3000);" +
+                    "<\/script>" +
+                "</div>";
+            } else {
+                document.getElementById("AlertPlaceholder").innerHTML = "<div class=\"alert alert-danger d-flex align-items-center bs-popover-start\" role=\"alert\">" +
+                    "<table width=\"100%\">" +
+                        "<tr>" +
+                            "<td align=\"left\" valign=\"middle\" style=\"font-size: 16px;\">" +
+                    "<i class=\"bi bi-exclamation-diamond\"></i>&nbsp;&nbsp;" +
+                                returned +
+                            "</td>" +
+                            "<td align=\"right\" valign=\"middle\">" +
+                                "<button type=\"button\" id=\"" + UiD + "\" class=\"btn-close\" data-bs-dismiss=\"alert\" title=\"Luk\"></button>" +
+                            "</td>" +
+                        "</tr>" +
+                    "</table>" +
+                "</div>";
+            }
+        });
+    }   
+    
+</script>

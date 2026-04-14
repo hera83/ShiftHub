@@ -1,0 +1,23 @@
+# Build output
+**/bin/
+**/obj/
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+
+# Logs (runtime log-filer)
+web/Logs/f*.txt
+
+# Build logs
+build_*.log
+
+# Application data (runtime data)
+web/App_Data/
+
+# Docker runtime data
+data/
+
+# Docker environment (indeholder passwords og hemmelige noegler)
+.env
