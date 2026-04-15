@@ -47,7 +47,7 @@
             url: '/Home/_SubPostDelete',
             data: { Id: PostGroupId }
         }).done(function (returned) {
-            document.getElementById('PostGroup_' + returned).remove();
+            document.getElementById('Group_' + returned).remove();
             PlaceHolderElement.find('.modal').modal('hide');
         });
     }
