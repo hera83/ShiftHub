@@ -3,16 +3,6 @@
     ViewData["Title"] = "Tilmelding";
 }
 
-<style>
-    .RuleFailed {
-        color: lightcoral !important;
-    }
-    .RulePassed {
-        color: green;
-    }
-
-</style>
-
 <div class="container">
     <table width="100%">
         <tr>
@@ -22,61 +12,29 @@
                     case 2:
                         {   
                             <!-- Bruger har allerede meldt vagter ind -->
-                            <table width="400">
-                                <tr>
-                                    <td colspan="3" align="center" valign="middle">
-                                        <h3>@Html.Raw($"{Model.Data.aTable.Rows[0]["Name"]}")</h3>
-                                    </td>
-                                </tr>
-                                
-                                <tr><td colspan="3" height="20"></td></tr>
-
-                                <tr>
-                                    <td colspan="3" align="center" valign="middle">
-                                        <i>Du har meldt timer ind.</i>
-                                    </td>
-                                </tr>
-
-                                <tr><td colspan="3" height="20"></td></tr>
-
-                                <tr>
-                                    <td colspan="3" align="left" valign="middle" height="40px">
-                                        <h5 style="text-decoration: underline;">Kontaktoplysninger</h5>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td align="left" valign="middle">
-                                        <b>Navn: </b>
-                                    </td>
-                                    <td width="5px"></td>
-                                    <td align="left" valign="middle">
-                                        <input type="text" class="form-control form-control-sm" asp-for="Tilmelding.Name" onkeydown="UpdateStaffButton()" id="staffName" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td align="left" valign="middle">
-                                        <b>Telefon: </b>
-                                    </td>
-                                    <td width="5px"></td>
-                                    <td align="left" valign="middle" title="Mobil nummer anbefales da der kan komme smser med informationer">
-                                        <input type="text" class="form-control form-control-sm" asp-for="Tilmelding.Phone" onkeydown="UpdateStaffButton()" id="staffPhone" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td align="left" valign="middle">
-                                        <b>Mail: </b>
-                                    </td>
-                                    <td width="5px"></td>
-                                    <td align="left" valign="middle">
-                                        <input type="text" class="form-control form-control-sm" asp-for="Tilmelding.Mail" onkeydown="UpdateStaffButton()" id="staffMail" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="3" align="center" valign="middle" style="padding: 10px 0px 0px 0px;">
-                                        <button type="button" class="btn btn-outline-success btn-sm" onclick="UpdateStaff()" style="width: 100%;"><i class="bi bi-check-circle" id="staffSaved" style="display: none;"> Gemt</i><div id="staffSave" style="display: block;">Gem</div></button>
-                                    </td>
-                                </tr>
-                            </table>
+                            <div class="sh-login-card mx-auto mt-3" style="max-width: 420px;">
+                                <h3 class="text-center mb-1">@Html.Raw($"{Model.Data.aTable.Rows[0]["Name"]}")</h3>
+                                <p class="text-center text-muted small mb-3"><i>Du har meldt timer ind.</i></p>
+                                <h6 class="sh-section-title">Kontaktoplysninger</h6>
+                                <div class="form-group">
+                                    <label class="form-label small fw-semibold text-secondary">Navn</label>
+                                    <input type="text" class="form-control form-control-sm" asp-for="Tilmelding.Name" onkeydown="UpdateStaffButton()" id="staffName" />
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label small fw-semibold text-secondary" title="Mobil nummer anbefales da der kan komme smser med informationer">Telefon</label>
+                                    <input type="text" class="form-control form-control-sm" asp-for="Tilmelding.Phone" onkeydown="UpdateStaffButton()" id="staffPhone" />
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label small fw-semibold text-secondary">Mail</label>
+                                    <input type="text" class="form-control form-control-sm" asp-for="Tilmelding.Mail" onkeydown="UpdateStaffButton()" id="staffMail" />
+                                </div>
+                                <div class="mt-3">
+                                    <button type="button" class="btn btn-outline-success btn-sm w-100" onclick="UpdateStaff()">
+                                        <i class="bi bi-check-circle" id="staffSaved" style="display: none;"> Gemt</i>
+                                        <div id="staffSave" style="display: block;">Gem</div>
+                                    </button>
+                                </div>
+                            </div>
                             break;
                         }
                     case 1:
@@ -95,7 +53,7 @@
                                         <table width="400">
                                             <tr>
                                                 <td colspan="3" align="left" valign="middle" height="40px">
-                                                    <h5 style="text-decoration: underline;">Vagter</h5>
+                                                    <h6 class="sh-section-title">Vagter</h6>
                                                 </td>
                                             </tr>
                                             <tr>
@@ -140,8 +98,8 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td colspan="3" align="center" valign="middle" style="padding: 10px 0px 0px 0px;">
-                                                    <button type="button" class="btn btn-outline-success btn-sm" onclick="SaveShift()" style="width: 100%;" id="shiftsSubmitId" disabled><i class="bi bi-check-circle" id="shiftSaved" style="display: none;"> Gemt</i><div id="shiftSave" style="display: block;">Gem</div></button>
+                                                <td colspan="3" align="center" valign="middle" class="pt-2">
+                                                    <button type="button" class="btn btn-outline-success btn-sm w-100" onclick="SaveShift()" id="shiftsSubmitId" disabled><i class="bi bi-check-circle" id="shiftSaved" style="display: none;"> Gemt</i><div id="shiftSave" style="display: block;">Gem</div></button>
                                                 </td>
                                             </tr>
 
@@ -149,7 +107,7 @@
 
                                             <tr>
                                                 <td colspan="3" align="left" valign="middle" height="40px">
-                                                    <h5 style="text-decoration: underline;">Kontaktoplysninger</h5>
+                                                    <h6 class="sh-section-title">Kontaktoplysninger</h6>
                                                 </td>
                                             </tr>
                                             <tr>
@@ -180,8 +138,8 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td colspan="3" align="center" valign="middle" style="padding: 10px 0px 0px 0px;">
-                                                    <button type="button" class="btn btn-outline-success btn-sm" onclick="UpdateStaff()" style="width: 100%;"><i class="bi bi-check-circle" id="staffSaved" style="display: none;"> Gemt</i><div id="staffSave" style="display: block;">Gem</div></button>
+                                                <td colspan="3" align="center" valign="middle" class="pt-2">
+                                                    <button type="button" class="btn btn-outline-success btn-sm w-100" onclick="UpdateStaff()"><i class="bi bi-check-circle" id="staffSaved" style="display: none;"> Gemt</i><div id="staffSave" style="display: block;">Gem</div></button>
                                                 </td>
                                             </tr>
                                         </table>
@@ -191,17 +149,17 @@
                                         <table width="400">
                                             <tr>
                                                 <td align="left" valign="middle" height="40px">
-                                                    <h5 style="text-decoration: underline;">Overblik</h5>
+                                                <h6 class="sh-section-title">Overblik</h6>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td align="center" valign="middle">
-                                                    <input class="form-control" value="Vagter valgt: 0" style="color: green;" id="shiftOverview" readonly />
+                                                    <input class="form-control sh-input-summary" value="Vagter valgt: 0" id="shiftOverview" readonly />
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td align="center" valign="middle">
-                                                    <input class="form-control" value="Total timer: 0" style="color: green;" id="shiftHours" readonly />
+                                                    <input class="form-control sh-input-summary" value="Total timer: 0" id="shiftHours" readonly />
                                                 </td>
                                             </tr>
 
@@ -209,7 +167,7 @@
 
                                             <tr>
                                                 <td align="left" valign="middle" height="40px">
-                                                    <h5 style="text-decoration: underline;">Regler</h5>
+                                                <h6 class="sh-section-title">Regler</h6>
                                                 </td>
                                             </tr>
                                             @foreach (System.Data.DataRow eRow in Model.Data.eTable.Rows)
@@ -249,14 +207,14 @@
                     case 0:
                         {
                             <!-- Pasiv -->
-                            <center><h3>Tilmeldingen er ikke aktiv</h3></center>
+                            <div class="text-center"><h3>Tilmeldingen er ikke aktiv</h3></div>
                             break;
                         }
 
                     default:
                         {
                             <!-- Link er ikke gyldigt -->
-                            <center><h3>Linket er ikke gyldigt?</h3></center>
+                            <div class="text-center"><h3>Linket er ikke gyldigt?</h3></div>
                             break;
                         }
                 }

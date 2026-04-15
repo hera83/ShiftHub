@@ -6,33 +6,26 @@
     /// Messages
     foreach (ShiftHub.Models.MessageModel.Message item in Model.Messages.aList)
     {
-        <div class="alert alert-@item.Type.ToString().ToLower() d-flex align-items-center bs-popover-start" role="alert">
-            <table width="100%">
-                <tr>
-                    <td align="left" valign="middle" style="font-size: 16px;">
-                        @switch (item.Type.ToString())
-                        {
-                            case "Info":
-                                <i class="bi bi-info-circle"></i>
-                                break;
-                            case "Success":
-                                <i class="bi bi-check-circle"></i>
-                                break;
-                            case "Warning":
-                                <i class="bi bi-exclamation-circle"></i>
-
-                                break;
-                            case "Danger":
-                                <i class="bi bi-exclamation-diamond"></i>
-                                break;
-                        }
-                        @item.Content
-                    </td>
-                    <td align="right" valign="middle">
-                        <button type="button" id="@item.UiD" class="btn-close" data-bs-dismiss="alert" title="Luk"></button>
-                    </td>
-                </tr>
-            </table>
+        <div class="alert alert-@item.Type.ToString().ToLower() sh-alert" role="alert">
+            <span class="sh-alert-icon">
+                @switch (item.Type.ToString())
+                {
+                    case "Info":
+                        <i class="bi bi-info-circle"></i>
+                        break;
+                    case "Success":
+                        <i class="bi bi-check-circle"></i>
+                        break;
+                    case "Warning":
+                        <i class="bi bi-exclamation-circle"></i>
+                        break;
+                    case "Danger":
+                        <i class="bi bi-exclamation-diamond"></i>
+                        break;
+                }
+            </span>
+            <span class="sh-alert-body">@item.Content</span>
+            <button type="button" id="@item.UiD" class="btn-close ms-auto" data-bs-dismiss="alert" title="Luk"></button>
         </div>
         @if (item.Type.ToString() != "Danger")
         {
@@ -50,7 +43,7 @@
 <div class="container">
     <link href="~/css/jquery.dataTables.min.css" rel="stylesheet" />
 
-    <table id="UserTable" style="font-size: 18px;">
+    <table id="UserTable">
         <thead>
             <tr>
                 <th>
@@ -95,10 +88,10 @@
                             {
                                 <ul class="nav navbar-nav">
                                     <li class="dropdown">
-                                        <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown" style="color: black;">Menu</a>
-                                        <ul class="dropdown-menu" style="font-size: small;">
-                                            <li><button type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("EditUser", "Home", new { UserId = Convert.ToInt32(aRow["Id"]) })" style="width: 100%;" title="">Rediger</button></li>
-                                            <li><button type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("DeleteUser", "Home", new { UserId = Convert.ToInt32(aRow["Id"]) })" style="width: 100%;" title="">Slet</button></li>
+                                        <a href="#" class="dropdown-toggle text-dark" data-bs-toggle="dropdown">Menu</a>
+                                        <ul class="dropdown-menu small">
+                                            <li><button type="button" class="btn btn-outline-dark btn-sm w-100" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("EditUser", "Home", new { UserId = Convert.ToInt32(aRow["Id"]) })" title="">Rediger</button></li>
+                                            <li><button type="button" class="btn btn-outline-dark btn-sm w-100" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("DeleteUser", "Home", new { UserId = Convert.ToInt32(aRow["Id"]) })" title="">Slet</button></li>
                                         </ul>
                                     </li>
                                 </ul>

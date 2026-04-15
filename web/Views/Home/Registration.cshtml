@@ -55,97 +55,49 @@
 <div class="container">
     <div class="row">
         <div class="col-3">
-            <h5><i class="bi bi-boxes"> Arrangementer</i></h5>
-            <hr />
-            <table border="0" width="100%">
+            <h6 class="sh-section-title"><i class="bi bi-boxes me-1"></i>Arrangementer</h6>
+            <hr class="sh-form-divider" />
+            <div class="d-flex flex-column gap-1">
                 @foreach (System.Data.DataRow aRow in Model.Data.aTable.Rows)
                 {
-                    <tr>
-                        <td align="left" valign="middle">
-                            <button type="button" id="Sub_@Html.Raw($"{aRow["Id"]}")" class="btn light" onclick="SubGroupSelect(@Html.Raw($"{aRow["Id"]}"))" style="width: 100%; text-align: left; border: 1px solid lightgray;" title="@Html.Raw($"{aRow["Description"]}")">
-                                <table width="100%">
-                                    <tr>
-                                        <td align="left">
-                                            <b>@Html.Raw($"{aRow["Name"]}")</b>
-                                        </td>
-                                        <td align="right">
-                                            @if ($"{aRow["Messages"]}" != "0")
-                                            {
-                                                <span class="badge bg-danger" id="@Html.Raw($"{aRow["Id"]}")_MainMessageCount">@Html.Raw($"{aRow["Messages"]}")</span>
-                                            }
-                                        </td>
-                                    </tr>
-                                </table>
-                            </button>
-                        </td>
-                    </tr>
+                    <button type="button" id="Sub_@Html.Raw($"{aRow["Id"]}")" class="btn light w-100 sh-subgroup-btn" onclick="SubGroupSelect(@Html.Raw($"{aRow["Id"]}"))" title="@Html.Raw($"{aRow["Description"]}")">
+                        <span class="d-flex justify-content-between align-items-center">
+                            <b>@Html.Raw($"{aRow["Name"]}")</b>
+                            @if ($"{aRow["Messages"]}" != "0")
+                            {
+                                <span class="badge bg-danger" id="@Html.Raw($"{aRow["Id"]}")_MainMessageCount">@Html.Raw($"{aRow["Messages"]}")</span>
+                            }
+                        </span>
+                    </button>
                 }
                 @if (Model.Data.aTable.Rows.Count == 0)
                 {
-                    <tr>
-                        <td align="center" valign="middle">
-                            <i>Ingen aktive grupper fundet</i>
-                        </td>
-                    </tr>
+                    <div class="text-muted text-center small py-1"><i>Ingen aktive grupper fundet</i></div>
                 }
+            </div>
+        </div>
             </table>
         </div>
         <div class="col my-1 m-1" id="workContainerId" style="display: none;">
             <ul class="nav nav-pills nav-fill" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button type="button" class="nav-link light active" id="tab-one" data-bs-toggle="tab" data-bs-target="#one" role="tab" aria-controls="one" aria-selected="true">
-                        <table align="center">
-                            <tr>
-                                <td>
-                                    <div>Overblik</div>
-                                </td>
-                                <td>
-                                    &nbsp;<span class="badge bg-danger" id="overviewMenuId"></span>
-                                </td>
-                            </tr>
-                        </table>
+                        <span class="d-inline-flex align-items-center gap-1">Overblik <span class="badge bg-danger" id="overviewMenuId"></span></span>
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button type="button" class="nav-link light" id="tab-two" data-bs-toggle="tab" data-bs-target="#two" role="tab" aria-controls="two" aria-selected="false">
-                        <table align="center">
-                            <tr>
-                                <td>
-                                    <div>Vagter</div>
-                                </td>
-                                <td>
-                                    &nbsp;<span class="badge bg-danger" id="shiftsMenuId"></span>
-                                </td>
-                            </tr>
-                        </table>
+                        <span class="d-inline-flex align-items-center gap-1">Vagter <span class="badge bg-danger" id="shiftsMenuId"></span></span>
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button type="button" class="nav-link light" id="tab-three" data-bs-toggle="tab" data-bs-target="#three" role="tab" aria-controls="three" aria-selected="false">
-                        <table align="center">
-                            <tr>
-                                <td>
-                                    <div>Tidsforbrug</div>
-                                </td>
-                                <td>
-                                    &nbsp;<span class="badge bg-danger" id="timeUsageMenuId"></span>
-                                </td>
-                            </tr>
-                        </table>
+                        <span class="d-inline-flex align-items-center gap-1">Tidsforbrug <span class="badge bg-danger" id="timeUsageMenuId"></span></span>
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button type="button" class="nav-link light" id="tab-four" data-bs-toggle="tab" data-bs-target="#four" role="tab" aria-controls="four" aria-selected="false">
-                        <table align="center">
-                            <tr>
-                                <td>
-                                    <div>Beskeder</div>
-                                </td>
-                                <td>
-                                    &nbsp;<span class="badge bg-danger" id="messagesMenuId"></span>
-                                </td>
-                            </tr>
-                        </table>
+                        <span class="d-inline-flex align-items-center gap-1">Beskeder <span class="badge bg-danger" id="messagesMenuId"></span></span>
                     </button>
                 </li>
             </ul>
@@ -154,97 +106,73 @@
                 <div id="AlertPlaceholder"></div>
                 <div class="tab-pane fade show active" id="one" role="tabpanel" aria-labelledby="tab-one">
                     <!-- Overview -->
-                    <table width="100%">
-                        <tr>
-                            <td>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <button type="button" class="btn lightButton" onclick="updateOverview()" title="Opdater">
-                                            <i class="bi bi-arrow-repeat" style="font-size: 1.2rem; color: gray;"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="row" id="OverviewView"></div>
-                                <div class="row">
-                                    <div class="col-md-12" align="center">
-                                        <b>Tilmeldinger</b>
-                                    </div>
-                                </div>
-                                <div class="row" id="RegistrationsView"></div>
-                            </td>
-                        </tr>
-                    </table>
+                    <div class="row mb-2 mt-1">
+                        <div class="col-md-12">
+                            <button type="button" class="btn lightButton sh-toolbar-btn" onclick="updateOverview()" title="Opdater">
+                                <i class="bi bi-arrow-repeat sh-icon-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row" id="OverviewView"></div>
+                    <p class="sh-section-title text-center mt-3 mb-1">Tilmeldinger</p>
+                    <div class="row" id="RegistrationsView"></div>
                 </div>
                 <div class="tab-pane fade" id="two" role="tabpanel" aria-labelledby="tab-two">
                     <!-- Shifts -->
-                    <table width="100%">
-                        <tr>
-                            <td>
-                                <div class="row">
-                                    <div class="col">
-                                        <button type="button" class="btn lightButton" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("SubShiftsViewAdd", "Home", new { })" title="Tilføj bruger">
-                                            <i class="bi bi-person-add" style="font-size: 1.2rem; color: gray;"></i>
-                                        </button>
-                                        <button type="button" class="btn lightButton" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("SubShiftsViewRegistrations", "Home", new { })" title="Se tilmeldinger">
-                                            <i class="bi bi-calendar-check" style="font-size: 1.2rem; color: gray;"></i>
-                                        </button>
-                                        <button type="button" class="btn lightButton" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("SubShiftsViewView", "Home", new { })" title="Se en samtælling af vagter">
-                                            <i class="bi bi-bar-chart" style="font-size: 1.2rem; color: gray;"></i>
-                                        </button>
-                                    </div>
-                                    <div class="col" align="right">
-                                        <input class="form-control" type="text" id="staffFilterId" placeholder="Søg" onkeyup="updateShifts()" style="width: 180px;" />
-                                    </div>
-                                </div>
-                                <table class="table" id="StaffList">
-                                </table>
-                            </td>
-                        </tr>
+                    <div class="row mb-2 mt-1">
+                        <div class="col">
+                            <button type="button" class="btn lightButton sh-toolbar-btn" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("SubShiftsViewAdd", "Home", new { })" title="Tilføj bruger">
+                                <i class="bi bi-person-add sh-icon-sm"></i>
+                            </button>
+                            <button type="button" class="btn lightButton sh-toolbar-btn" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("SubShiftsViewRegistrations", "Home", new { })" title="Se tilmeldinger">
+                                <i class="bi bi-calendar-check sh-icon-sm"></i>
+                            </button>
+                            <button type="button" class="btn lightButton sh-toolbar-btn" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("SubShiftsViewView", "Home", new { })" title="Se en samtælling af vagter">
+                                <i class="bi bi-bar-chart sh-icon-sm"></i>
+                            </button>
+                        </div>
+                        <div class="col" align="right">
+                            <input class="form-control form-control-sm sh-search" type="text" id="staffFilterId" placeholder="Søg" onkeyup="updateShifts()" />
+                        </div>
+                    </div>
+                    <table class="table" id="StaffList">
                     </table>
                 </div>
                 <div class="tab-pane fade" id="three" role="tabpanel" aria-labelledby="tab-three">
                     <!-- TimeUsage -->
-                    <table width="100%">
-                        <tr>
-                            <td>
-                                <div class="row">
-                                    <div class="col">
-                                        <button type="button" class="btn lightButton" onclick="location.href='/Home/SubShiftsViewHoursExport?SubGroupId=' + document.getElementById('SubGroupValue').value" title="Export timer">
-                                            <i class="bi bi-database-down" style="font-size: 1.2rem; color: gray;"></i>
-                                        </button>
-                                    </div>
-                                    <div class="col" align="right">
-                                        <input class="form-control" type="text" id="timeFilterId" placeholder="Søg" onkeyup="updateTimeUsage()" style="width: 180px;" />
-                                    </div>
-                                </div>
-                                <table class="table" id="TimeList">
-                                </table>
-                            </td>
-                        </tr>
+                    <div class="row mb-2 mt-1">
+                        <div class="col">
+                            <button type="button" class="btn lightButton sh-toolbar-btn" onclick="location.href='/Home/SubShiftsViewHoursExport?SubGroupId=' + document.getElementById('SubGroupValue').value" title="Export timer">
+                                <i class="bi bi-database-down sh-icon-sm"></i>
+                            </button>
+                        </div>
+                        <div class="col" align="right">
+                            <input class="form-control form-control-sm sh-search" type="text" id="timeFilterId" placeholder="Søg" onkeyup="updateTimeUsage()" />
+                        </div>
+                    </div>
+                    <table class="table" id="TimeList">
                     </table>
                 </div>
                 <div class="tab-pane fade" id="four" role="tabpanel" aria-labelledby="tab-four">
                     <!-- Messages -->
-                    <div>
-                        <div class="row">
-                            <div class="col">
-                                <button type="button" class="btn lightButton" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("SubMessageSendMessage", "Home", new { })" title="Send besked">
-                                    <i class="bi bi-envelope-plus" style="font-size: 1.2rem; color: gray;"></i>
-                                </button>
-                                <button type="button" class="btn lightButton" onclick="messageShowAll()" id="messageShowAllButton" title="Vis alle">
-                                    <i class="bi bi-inbox" style="font-size: 1.2rem; color: gray;"></i>
-                                </button>
-                                <button type="button" class="btn lightButton" onclick="updateMessages()" title="Opdater">
-                                    <i class="bi bi-arrow-repeat" style="font-size: 1.2rem; color: gray;"></i>
-                                </button>
-                            </div>
-                            <div class="col" align="right">
-                                <input class="form-control" type="text" id="messagesFilterId" placeholder="Søg" onkeyup="updateMessages()" style="width: 240px;" />
-                            </div>
+                    <div class="row mb-2 mt-1">
+                        <div class="col">
+                            <button type="button" class="btn lightButton sh-toolbar-btn" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("SubMessageSendMessage", "Home", new { })" title="Send besked">
+                                <i class="bi bi-envelope-plus sh-icon-sm"></i>
+                            </button>
+                            <button type="button" class="btn lightButton sh-toolbar-btn" onclick="messageShowAll()" id="messageShowAllButton" title="Vis alle">
+                                <i class="bi bi-inbox sh-icon-sm"></i>
+                            </button>
+                            <button type="button" class="btn lightButton sh-toolbar-btn" onclick="updateMessages()" title="Opdater">
+                                <i class="bi bi-arrow-repeat sh-icon-sm"></i>
+                            </button>
                         </div>
-                        <table class="table" id="MessagesList">
-                        </table>
+                        <div class="col" align="right">
+                            <input class="form-control form-control-sm sh-search" type="text" id="messagesFilterId" placeholder="Søg" onkeyup="updateMessages()" />
+                        </div>
                     </div>
+                    <table class="table" id="MessagesList">
+                    </table>
                 </div>
             </div>
         </div>

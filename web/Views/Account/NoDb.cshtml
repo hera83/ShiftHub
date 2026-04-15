@@ -3,51 +3,24 @@
     ViewData["Title"] = "Opret ny database";
 }
 <div class="container">
-    <table border="0" style="width: 100%; height: 40vh;">
-        <tr>
-            <td align="center" valign="middle">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-4 col-lg-3">
+            <div class="sh-login-card">
+                <div class="sh-login-title">Administrator Bruger</div>
                 <form action="NoDb" method="post">
-                    <table border="0">
-                        <tr>
-                            <td colspan="2" align="center" valign="top" style="height: 60px;">
-                                <h3>Administrator Bruger</h3>
-                                <hr />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td align="right">
-                                <b>Brugernavn</b>&nbsp;
-                            </td>
-                            <td>
-                                <input type="text" asp-for="Username" />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2">
-                                <span asp-validation-for="Username" class="text-danger"></span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td align="right">
-                                <b>Adgangskode</b>&nbsp;
-                            </td>
-                            <td>
-                                <input type="password" asp-for="Password" />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2">
-                                <span asp-validation-for="Username" class="text-danger"></span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2" align="center" valign="bottom" style="height: 50px;">
-                                <button type="submit" class="btn btn-success btn-primary btn-sm">Opret</button>
-                            </td>
-                        </tr>
-                    </table>
+                    <div class="form-group mb-3">
+                        <label asp-for="Username">Brugernavn</label>
+                        <input type="text" asp-for="Username" class="form-control" />
+                        <span asp-validation-for="Username" class="text-danger small"></span>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label asp-for="Password">Adgangskode</label>
+                        <input type="password" asp-for="Password" class="form-control" />
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Opret</button>
                 </form>
-            </td>
-        </tr>
-    </table>
+            </div>
+        </div>
+    </div>
 </div>

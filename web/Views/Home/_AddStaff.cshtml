@@ -1,10 +1,10 @@
 ﻿@model ShiftHub.Models.HomeModels
 
 <div class="modal fade">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Opret bruger</h4>
+                <h5 class="modal-title">Opret bruger</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
@@ -13,65 +13,68 @@
                     <div class="form-group">
                         <label asp-for="Staff.Name">Navn</label>
                         <input asp-for="Staff.Name" onchange="vSave()" class="form-control" id="NameId" />
-                        <span asp-validation-for="Staff.Name" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="Staff.Address">Adresse</label>
-                        <input asp-for="Staff.Address" class="form-control" />
-                        <span asp-validation-for="Staff.Address" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="Staff.ZipCode">Post Nr.</label>
-                        <input asp-for="Staff.ZipCode" class="form-control" />
-                        <span asp-validation-for="Staff.ZipCode" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="Staff.City">By</label>
-                        <input asp-for="Staff.City" class="form-control" />
-                        <span asp-validation-for="Staff.City" class="text-danger"></span>
+                        <span asp-validation-for="Staff.Name" class="text-danger small"></span>
                     </div>
                     <div class="form-group">
                         <label asp-for="Staff.Birthday">Fødselsdag</label>
                         <input type="date" asp-for="Staff.Birthday" class="form-control" />
-                        <span asp-validation-for="Staff.Birthday" class="text-danger"></span>
+                        <span asp-validation-for="Staff.Birthday" class="text-danger small"></span>
                     </div>
+                    <hr class="sh-form-divider" />
+                    <div class="form-group">
+                        <label asp-for="Staff.Address">Adresse</label>
+                        <input asp-for="Staff.Address" class="form-control" />
+                        <span asp-validation-for="Staff.Address" class="text-danger small"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Staff.ZipCode">Post Nr.</label>
+                        <input asp-for="Staff.ZipCode" class="form-control" />
+                        <span asp-validation-for="Staff.ZipCode" class="text-danger small"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Staff.City">By</label>
+                        <input asp-for="Staff.City" class="form-control" />
+                        <span asp-validation-for="Staff.City" class="text-danger small"></span>
+                    </div>
+                    <hr class="sh-form-divider" />
                     <div class="form-group">
                         <label asp-for="Staff.Mail">Mail</label>
                         <input type="email" asp-for="Staff.Mail" onchange="CheckNotification()" class="form-control" id="MailId" />
-                        <span asp-validation-for="Staff.Mail" class="text-danger"></span>
+                        <span asp-validation-for="Staff.Mail" class="text-danger small"></span>
                     </div>
                     <div class="form-group">
                         <label asp-for="Staff.Phone">Telefon Nr</label>
                         <input asp-for="Staff.Phone" class="form-control" />
-                        <span asp-validation-for="Staff.Phone" class="text-danger"></span>
+                        <span asp-validation-for="Staff.Phone" class="text-danger small"></span>
                     </div>
+                    <hr class="sh-form-divider" />
                     <div class="form-group">
                         <label asp-for="Staff.Key1">Key1</label>
                         <input asp-for="Staff.Key1" class="form-control" />
-                        <span asp-validation-for="Staff.Key1" class="text-danger"></span>
+                        <span asp-validation-for="Staff.Key1" class="text-danger small"></span>
                     </div>
                     <div class="form-group">
                         <label asp-for="Staff.Key2">Key2</label>
                         <input asp-for="Staff.Key2" class="form-control" />
-                        <span asp-validation-for="Staff.Key2" class="text-danger"></span>
+                        <span asp-validation-for="Staff.Key2" class="text-danger small"></span>
                     </div>
                     <div class="form-group">
                         <label asp-for="Staff.Key3">Key3</label>
                         <input asp-for="Staff.Key3" class="form-control" />
-                        <span asp-validation-for="Staff.Key3" class="text-danger"></span>
+                        <span asp-validation-for="Staff.Key3" class="text-danger small"></span>
                     </div>
-                    <hr />
+                    <hr class="sh-form-divider" />
                     <div class="form-group form-switch">
                         <input type="checkbox" asp-for="Staff.Notification" class="form-check-input" id="NotificationId" disabled />&nbsp;
                         <label asp-for="Staff.Notification" title="Velkomst Mail">Notifikation</label>
-                        <span asp-validation-for="Staff.Notification" class="text-danger"></span>
+                        <span asp-validation-for="Staff.Notification" class="text-danger small"></span>
                     </div>
                 </form>
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bs-save="modal" id="AddId" disabled>Opret</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Luk</button>
+                <button type="button" class="btn btn-primary" data-bs-save="modal" id="AddId" disabled>Opret</button>
             </div>
         </div>
     </div>

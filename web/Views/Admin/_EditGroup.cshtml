@@ -4,7 +4,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Rediger Gruppe</h4>
+                <h5 class="modal-title">Rediger Gruppe</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
@@ -20,24 +20,25 @@
                                 <option value="@row["Id"].ToString()">@row["DisplayName"].ToString()</option>
                             }
                         </select>
-                        <span asp-validation-for="Group.InChargeId" class="text-danger"></span>
+                        <span asp-validation-for="Group.InChargeId" class="text-danger small"></span>
                     </div>
+                    <hr class="sh-form-divider" />
                     <div class="form-group">
                         <label asp-for="Group.Name">Navn</label>
                         <input asp-for="Group.Name" onchange="vSave()" class="form-control" id="NameId" />
-                        <span asp-validation-for="Group.Name" class="text-danger"></span>
+                        <span asp-validation-for="Group.Name" class="text-danger small"></span>
                     </div>
                     <div class="form-group">
                         <label asp-for="Group.Note">Note</label>
                         <textarea asp-for="Group.Note" rows="4" class="form-control"></textarea>
-                        <span asp-validation-for="Group.Note" class="text-danger"></span>
+                        <span asp-validation-for="Group.Note" class="text-danger small"></span>
                     </div>
                 </form>
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bs-save="modal" id="AddId">Gem</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Luk</button>
+                <button type="button" class="btn btn-primary" data-bs-save="modal" id="AddId">Gem</button>
             </div>
         </div>
     </div>

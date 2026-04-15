@@ -12,7 +12,7 @@
                 <table width="100%">
                     <tr>
                         <td align="left" valign="top">
-                            <font style="font-size: 16px; font-weight: 600;">Bruger er <u>ikke</u> mødt til sin vagt?</font>
+                            <span class="fw-semibold">Bruger er <u>ikke</u> mødt til sin vagt?</span>
                             <hr />
                             <b>@Html.Raw($"{Model.Data.aTable.Rows[0]["Name"]}")</b><br />
                             <i>@Html.Raw($"{Model.Data.aTable.Rows[0]["Mail"]}")</i><br />
@@ -31,19 +31,19 @@
                             </i><br />
                         </td>
                         <td align="center" valign="top" width="20px">
-                            <div style="min-height: 200px; border-left: 1px solid lightgray; margin-left: 10px;"></div>
+                            <div class="sh-vdivider"></div>
                         </td>
                         <td align="left" valign="top" width="150px">
-                            <button type="button" class="btn btn-outline-dark" onclick="StaffSnooz(15)" style="width: 100%; margin-bottom: 8px;">
+                            <button type="button" class="btn btn-outline-dark w-100 mb-2" onclick="StaffSnooz(15)">
                                 Udskyd 15 Min
                             </button>
-                            <button type="button" class="btn btn-outline-dark" onclick="StaffSnooz(30)" style="width: 100%; margin-bottom: 8px;">
+                            <button type="button" class="btn btn-outline-dark w-100 mb-2" onclick="StaffSnooz(30)">
                                 Udskyd 30 Min
                             </button>
-                            <button type="button" class="btn btn-outline-dark" onclick="StaffSnooz(60)" style="width: 100%; margin-bottom: 8px;">
+                            <button type="button" class="btn btn-outline-dark w-100 mb-2" onclick="StaffSnooz(60)">
                                 Udskyd 60 Min
                             </button>
-                            <button type="button" class="btn btn-outline-danger" onclick="StaffAbsent()" style="width: 100%;">
+                            <button type="button" class="btn btn-outline-danger w-100" onclick="StaffAbsent()">
                                 Udeblevet
                             </button>
                         </td>

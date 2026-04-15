@@ -4,7 +4,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Slet Gruppe</h4>
+                <h5 class="modal-title">Slet Gruppe</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
@@ -15,20 +15,19 @@
                     <div class="form-group">
                         <label asp-for="Group.Name">Navn</label>
                         <input asp-for="Group.Name" class="form-control" readonly />
-                        <span asp-validation-for="Group.Name" class=" text-danger"></span>
+                        <span asp-validation-for="Group.Name" class="text-danger small"></span>
                     </div>
-                    <hr />
-                    <div class="form-group form-switch">
-                        <input type="checkbox" asp-for="Group.Notification" class="form-check-input" id="NotificationId" />&nbsp;
-                        <label asp-for="Group.Notification">Bekræft sletning</label>
-                        <span asp-validation-for="Group.Notification" class="text-danger"></span>
+                    <div class="sh-danger-zone mt-3">
+                        <input type="checkbox" asp-for="Group.Notification" class="form-check-input" id="NotificationId" />
+                        <label asp-for="Group.Notification" class="form-check-label">Bekræft sletning</label>
+                        <span asp-validation-for="Group.Notification" class="text-danger small"></span>
                     </div>
                 </form>
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger btn-primary" data-bs-save="modal" id="DeleteId" disabled>Slet</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Luk</button>
+                <button type="button" class="btn btn-danger" data-bs-save="modal" id="DeleteId" disabled>Slet</button>
             </div>
         </div>
     </div>

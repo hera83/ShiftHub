@@ -2,14 +2,14 @@
 
 <div class="modal fade">
     <div class="modal-dialog modal-xl">
-        <div class="modal-content" style="height: 90vh;">
+        <div class="modal-content sh-modal-tall">
             <div class="modal-header">
                 <h4 class="modal-title">@Model.MessageView.Subject</h4>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
             <div class="modal-body">
-                <textarea style="width: 100%; height: 100%; border: none;" id="MessageId">@Model.MessageView.Message</textarea>
+                <textarea class="w-100 sh-textarea-plain" style="height: 100%;" id="MessageId">@Model.MessageView.Message</textarea>
             </div>
 
             <div class="modal-footer">

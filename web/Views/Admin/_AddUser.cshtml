@@ -1,10 +1,10 @@
 ﻿@model ShiftHub.Models.AdminModels
 
 <div class="modal fade">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Opret Bruger</h4>
+                <h5 class="modal-title">Opret Bruger</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
@@ -13,12 +13,12 @@
                     <div class="form-group">
                         <label asp-for="User.Username">Brugernavn</label>
                         <input asp-for="User.Username" class="form-control" id="UsernameId" readonly />
-                        <span asp-validation-for="User.Username" class="text-danger"></span>
+                        <span asp-validation-for="User.Username" class="text-danger small"></span>
                     </div>
                     <div class="form-group">
                         <label asp-for="User.Password">Adgangskode</label>
                         <input type="password" asp-for="User.Password" onchange="vSave()" class="form-control" id="PasswordId" />
-                        <span asp-validation-for="User.Password" class="text-danger"></span>
+                        <span asp-validation-for="User.Password" class="text-danger small"></span>
                     </div>
                     <div class="form-group">
                         <label asp-for="User.GroupId">Gruppe</label>
@@ -29,36 +29,36 @@
                                 <option value="@row["Id"].ToString()">@row["Name"].ToString()</option>
                             }
                         </select>
-                        <span asp-validation-for="User.GroupId" class="text-danger"></span>
+                        <span asp-validation-for="User.GroupId" class="text-danger small"></span>
                     </div>
-                    <hr />
+                    <hr class="sh-form-divider" />
                     <div class="form-group">
                         <label asp-for="User.DisplayName">Fuldenavn</label>
                         <input asp-for="User.DisplayName" onchange="GenerateUsername()" class="form-control" id="DisplayNameId" />
-                        <span asp-validation-for="User.DisplayName" class="text-danger"></span>
+                        <span asp-validation-for="User.DisplayName" class="text-danger small"></span>
                     </div>
                     <div class="form-group">
                         <label asp-for="User.Mail">Mail</label>
                         <input type="email" asp-for="User.Mail" onchange="CheckNotification()" class="form-control" id="MailId" />
-                        <span asp-validation-for="User.Mail" class="text-danger"></span>
+                        <span asp-validation-for="User.Mail" class="text-danger small"></span>
                     </div>
                     <div class="form-group">
                         <label asp-for="User.Phone">Telefon Nr</label>
                         <input asp-for="User.Phone" class="form-control" />
-                        <span asp-validation-for="User.Phone" class="text-danger"></span>
+                        <span asp-validation-for="User.Phone" class="text-danger small"></span>
                     </div>
-                    <hr />
+                    <hr class="sh-form-divider" />
                     <div class="form-group form-switch">
                         <input type="checkbox" asp-for="User.Notification" class="form-check-input" id="NotificationId" disabled />&nbsp;
                         <label asp-for="User.Notification" title="Velkomst Mail">Notifikation</label>
-                        <span asp-validation-for="User.Notification" class="text-danger"></span>
+                        <span asp-validation-for="User.Notification" class="text-danger small"></span>
                     </div>
                 </form>
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bs-save="modal" id="AddId" disabled>Opret</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Luk</button>
+                <button type="button" class="btn btn-primary" data-bs-save="modal" id="AddId" disabled>Opret</button>
             </div>
         </div>
     </div>

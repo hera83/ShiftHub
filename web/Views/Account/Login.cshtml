@@ -12,27 +12,26 @@
 }
 
 <div class="container">
-    <form action="Login" method="post">
-        <div class="row">
-            <div class="col-md-4 offset-md-4">
-                <br />
-
-                <div class="form-group">
-                    <label asp-for="Username">Brugernavn</label>
-                    <input asp-for="Username" class="form-control" />
-                    <span asp-validation-for="Username" class="text-danger"></span>
+    <div class="row justify-content-center">
+        <div class="col-md-5 col-lg-4">
+            <div class="sh-login-card">
+                <div class="sh-login-title">
+                    <i class="bi bi-grid-3x3-gap-fill me-2"></i>ShiftHub
                 </div>
-                <div class="form-group">
-                    <label asp-for="Password">Adgangskode</label>
-                    <input type="password" asp-for="Password" class="form-control" />
-                    <span asp-validation-for="Password" class="text-danger"></span>
-                </div>
-                <br />
-                <div class="form-group d-grid gap-2">
-                    <button type="submit" class="btn btn-primary">Login</button>
-                </div>
-                <br />
+                <form action="Login" method="post">
+                    <div class="form-group mb-3">
+                        <label asp-for="Username">Brugernavn</label>
+                        <input asp-for="Username" class="form-control" />
+                        <span asp-validation-for="Username" class="text-danger small"></span>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label asp-for="Password">Adgangskode</label>
+                        <input type="password" asp-for="Password" class="form-control" />
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                </form>
             </div>
         </div>
-    </form>
+    </div>
 </div>

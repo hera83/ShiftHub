@@ -1,58 +1,104 @@
+/* =============================================
+   SHIFTHUB DESIGN SYSTEM
+   Scope: global utility classes and components.
+   Bootstrap is the base – these extend it.
+   No IDs, no JS hooks, no form bindings touched.
+   ============================================= */
+
+/* --- Design tokens ------------------------------------------------- */
+:root {
+    --sh-primary:           #2563eb;
+    --sh-primary-hover:     #1d4ed8;
+    --sh-surface:           #f8fafc;
+    --sh-surface-card:      #ffffff;
+    --sh-border:            #e2e8f0;
+    --sh-border-light:      #f1f5f9;
+    --sh-text-primary:      #1e293b;
+    --sh-text-secondary:    #64748b;
+    --sh-text-muted:        #94a3b8;
+    --sh-radius-sm:         5px;
+    --sh-radius:            8px;
+    --sh-radius-lg:         12px;
+    --sh-shadow-sm:         0 1px 2px rgba(0, 0, 0, .05);
+    --sh-shadow:            0 1px 3px rgba(0, 0, 0, .10), 0 1px 2px rgba(0, 0, 0, .06);
+    --sh-shadow-md:         0 4px 6px rgba(0, 0, 0, .07), 0 2px 4px rgba(0, 0, 0, .04);
+    --sh-transition:        150ms ease-in-out;
+}
+
+/* --- Base ---------------------------------------------------------- */
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 70px;
+    background-color: var(--sh-surface);
+    color: var(--sh-text-primary);
 }
 
-/* Custom */
+/* --- Preserved functional classes (names unchanged) ---------------- */
+
+/* Sidebar / list item hover */
 .light:hover {
-    border-radius: 5px;
-    background-color: #f2f2f2;
+    border-radius: var(--sh-radius-sm);
+    background-color: #f1f5f9;
 }
+
+/* Icon-action button base and hover */
+.lightButton {
+    padding: 4px 8px;
+    border-radius: var(--sh-radius-sm);
+    border: 1px solid transparent;
+    transition: background-color var(--sh-transition), border-color var(--sh-transition);
+}
+
 .lightButton:hover {
-    border-radius: 5px;
-    background-color: #e6f5ff;
-    border: 1px solid black;
+    border-radius: var(--sh-radius-sm);
+    background-color: #eff6ff;
+    border: 1px solid #bfdbfe;
 }
 
-.nav-link {
-    color: black;
-}
-
-    .nav-link:hover {
-        color: black;
-    }
-
+/* Selected arrangement in sidebar */
 .SubGroupSelected {
-    background-color: lightgray !important;
+    background-color: #dbeafe !important;
+    border-color: #93c5fd !important;
 }
 
+/* Nav links */
+.nav-link {
+    color: var(--sh-text-primary);
+}
+
+.nav-link:hover {
+    color: var(--sh-text-primary);
+}
+
+/* Three-dots context icon */
 .nav-custom-dropdown {
     text-align: center;
     width: 5px;
 }
+
 .bi-three-dots-vertical:hover {
     padding: 7px 0px 7px 0px;
-    outline: 1px solid gray;
+    outline: 1px solid var(--sh-border);
     outline-offset: -1px;
-    border-radius: 5px;
-    border-color: lightgray;
-    background-color: #f2f2f2;
+    border-radius: var(--sh-radius-sm);
+    background-color: #f1f5f9;
 }
 
+/* Dropdown submenu positioning (preserved exactly) */
 .dropdown-menu li {
     position: relative;
 }
@@ -71,4 +117,866 @@ body {
 
 .dropdown-menu > li:hover > .dropdown-submenu {
     display: block;
+}
+
+/* =============================================
+   NAVBAR
+   ============================================= */
+
+.sh-navbar {
+    background-color: var(--sh-surface-card) !important;
+    border-bottom: 1px solid var(--sh-border) !important;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, .06);
+    padding: .5rem 0;
+}
+
+/* Brand / logo */
+.sh-brand {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--sh-primary) !important;
+    letter-spacing: -.02em;
+    text-decoration: none;
+}
+
+.sh-brand:hover {
+    color: var(--sh-primary-hover) !important;
+    text-decoration: none;
+}
+
+/* ---- Nav links (override Bootstrap text-dark !important) ----------- */
+.sh-navbar .navbar-nav .nav-link,
+.sh-navbar .navbar-nav .nav-link.text-dark {
+    font-size: .875rem;
+    font-weight: 500;
+    padding: .375rem .7rem !important;
+    border-radius: var(--sh-radius-sm);
+    color: var(--sh-text-secondary) !important;
+    transition: background-color var(--sh-transition), color var(--sh-transition);
+    margin: 0 1px;
+    text-decoration: none;
+}
+
+.sh-navbar .navbar-nav .nav-link:hover,
+.sh-navbar .navbar-nav .nav-link.text-dark:hover {
+    background-color: var(--sh-border-light);
+    color: var(--sh-text-primary) !important;
+    text-decoration: none;
+}
+
+/* ---- Dropdown panel ----------------------------------------------- */
+.sh-navbar .dropdown-menu {
+    border: 1px solid var(--sh-border);
+    border-radius: var(--sh-radius);
+    box-shadow: var(--sh-shadow-md);
+    padding: .25rem .2rem;
+    min-width: 165px;
+    margin-top: .3rem;
+}
+
+.sh-navbar .dropdown-menu .nav-link,
+.sh-navbar .dropdown-menu .nav-link.text-dark {
+    padding: .35rem .65rem !important;
+    margin: 1px 0;
+    font-size: .84rem;
+    border-radius: var(--sh-radius-sm);
+}
+
+.sh-navbar .dropdown-menu hr {
+    margin: .2rem .4rem;
+    border-color: var(--sh-border-light);
+    opacity: 1;
+}
+
+/* ---- Mobile toggler ----------------------------------------------- */
+.sh-navbar .navbar-toggler {
+    border: 1px solid var(--sh-border);
+    border-radius: var(--sh-radius-sm);
+    padding: .35rem .55rem;
+}
+
+.sh-navbar .navbar-toggler:focus {
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+}
+
+/* =============================================
+   FOOTER
+   ============================================= */
+
+.sh-footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: var(--sh-surface-card);
+    border-top: 1px solid var(--sh-border);
+    padding: .375rem 0;
+    font-size: .74rem;
+    color: var(--sh-text-muted);
+    z-index: 1000;
+    letter-spacing: .01em;
+}
+
+.sh-footer .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 24px;
+}
+
+/* Left side: copyright */
+.sh-footer-brand {
+    color: var(--sh-text-muted);
+}
+
+/* Right side: logged-in user + group */
+.sh-footer-user {
+    color: var(--sh-text-secondary);
+    font-weight: 500;
+}
+
+@media (max-width: 575.98px) {
+    .sh-footer-brand { display: none; }
+    .sh-footer .container { justify-content: flex-end; }
+}
+
+/* =============================================
+   PAGE HEADER  (.sh-page-header)
+   Use:  <div class="sh-page-header">
+           <i class="bi bi-people"></i> Brugere
+         </div>
+   ============================================= */
+
+.sh-page-header {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    margin-bottom: .75rem;
+    padding-bottom: .625rem;
+    border-bottom: 1px solid var(--sh-border);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--sh-text-primary);
+}
+
+.sh-page-header .bi {
+    color: var(--sh-text-secondary);
+    font-size: 1.1rem;
+}
+
+/* =============================================
+   ACTION BAR  (.sh-action-bar)
+   A flex row containing toolbar buttons and
+   an optional right-aligned search field.
+   ============================================= */
+
+.sh-action-bar {
+    display: flex;
+    align-items: center;
+    gap: .375rem;
+    flex-wrap: wrap;
+    margin-bottom: .625rem;
+}
+
+.sh-action-bar-right {
+    margin-left: auto;
+}
+
+/* =============================================
+   TOOLBAR BUTTONS  (.sh-toolbar-btn)
+   Wraps .lightButton visually for icon-only
+   or icon+label usage in action bars.
+   ============================================= */
+
+.sh-toolbar-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: .35rem .5rem;
+    background: var(--sh-surface-card);
+    border: 1px solid var(--sh-border);
+    border-radius: var(--sh-radius-sm);
+    color: var(--sh-text-secondary);
+    cursor: pointer;
+    transition: background-color var(--sh-transition),
+                border-color var(--sh-transition),
+                color var(--sh-transition);
+    font-size: .85rem;
+    line-height: 1;
+}
+
+.sh-toolbar-btn .bi {
+    font-size: 1.1rem;
+}
+
+.sh-toolbar-btn:hover {
+    background-color: #eff6ff;
+    border-color: #93c5fd;
+    color: var(--sh-primary);
+}
+
+.sh-toolbar-btn:disabled,
+.sh-toolbar-btn[disabled] {
+    opacity: .45;
+    pointer-events: none;
+}
+
+/* =============================================
+   SEARCH INPUT  (.sh-search)
+   Applied alongside .form-control in
+   action-bar filter inputs.
+   ============================================= */
+
+.sh-search {
+    width: 180px !important;
+    border-radius: var(--sh-radius-sm) !important;
+    border: 1px solid var(--sh-border) !important;
+    box-shadow: none !important;
+    font-size: .875rem !important;
+}
+
+.sh-search:focus {
+    border-color: #93c5fd !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .08) !important;
+}
+
+/* =============================================
+   SECTION TITLE  (.sh-section-title)
+   Replaces inline <h5 style="text-decoration:underline">
+   and similar headings within panels.
+   ============================================= */
+
+.sh-section-title {
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--sh-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: .045em;
+    margin: 0 0 .5rem 0;
+    padding-bottom: .35rem;
+    border-bottom: 1px solid var(--sh-border-light);
+}
+
+/* =============================================
+   CARDS / PANELS  (.sh-card)
+   Bootstrap .card is also improved globally.
+   ============================================= */
+
+.sh-card {
+    background: var(--sh-surface-card);
+    border: 1px solid var(--sh-border);
+    border-radius: var(--sh-radius);
+    box-shadow: var(--sh-shadow-sm);
+    padding: 1rem;
+    margin-bottom: .75rem;
+}
+
+/* Global Bootstrap card improvement */
+.card {
+    border: 1px solid var(--sh-border);
+    border-radius: var(--sh-radius);
+    box-shadow: var(--sh-shadow-sm);
+}
+
+.card-header {
+    background-color: var(--sh-surface);
+    border-bottom: 1px solid var(--sh-border);
+    font-size: .78rem;
+    font-weight: 600;
+    color: var(--sh-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: .045em;
+    padding: .5rem .875rem;
+}
+
+.card-body {
+    padding: .75rem .875rem;
+}
+
+/* =============================================
+   FORM SECTIONS  (.sh-form-section)
+   ============================================= */
+
+.sh-form-section {
+    background: var(--sh-surface-card);
+    border: 1px solid var(--sh-border);
+    border-radius: var(--sh-radius);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--sh-shadow-sm);
+}
+
+.sh-form-section-title {
+    font-size: .78rem;
+    font-weight: 600;
+    color: var(--sh-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin-bottom: .625rem;
+    padding-bottom: .375rem;
+    border-bottom: 1px solid var(--sh-border-light);
+}
+
+/* =============================================
+   TABLE WRAPPER  (.sh-table-wrapper)
+   Wraps DataTable or .table for visual framing.
+   The table id and DataTable init are untouched.
+   ============================================= */
+
+.sh-table-wrapper {
+    background: var(--sh-surface-card);
+    border: 1px solid var(--sh-border);
+    border-radius: var(--sh-radius);
+    box-shadow: var(--sh-shadow-sm);
+    overflow: hidden;
+}
+
+.sh-table-wrapper .table {
+    margin-bottom: 0;
+}
+
+/* Global table improvements */
+.table th {
+    font-size: .78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--sh-text-secondary);
+    background-color: var(--sh-surface);
+    border-bottom: 2px solid var(--sh-border);
+    white-space: nowrap;
+}
+
+.table td {
+    font-size: .875rem;
+    color: var(--sh-text-primary);
+    vertical-align: middle;
+    border-bottom: 1px solid var(--sh-border-light);
+}
+
+.table > :not(caption) > * > * {
+    padding: .5rem .75rem;
+}
+
+/* =============================================
+   BADGE / STATUS  (.sh-badge-*)
+   ============================================= */
+
+.sh-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .25rem;
+    padding: .175rem .55rem;
+    border-radius: 9999px;
+    font-size: .72rem;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: .03em;
+}
+
+.sh-badge-primary { background-color: #dbeafe; color: #1d4ed8; }
+.sh-badge-success { background-color: #d1fae5; color: #065f46; }
+.sh-badge-warning { background-color: #fef3c7; color: #92400e; }
+.sh-badge-danger  { background-color: #fee2e2; color: #991b1b; }
+.sh-badge-muted   { background-color: var(--sh-border-light); color: var(--sh-text-secondary); }
+
+/* =============================================
+   ALERTS  (Bootstrap alert improvements)
+   The existing alert-* classes are preserved
+   and visually improved below.
+   ============================================= */
+
+.alert {
+    border-radius: var(--sh-radius);
+    border: 1px solid transparent;
+    font-size: .875rem;
+    padding: .6rem 1rem;
+    margin-bottom: .75rem;
+}
+
+.alert-info    { background-color: #eff6ff; border-color: #bfdbfe; color: #1e40af; }
+.alert-success { background-color: #f0fdf4; border-color: #a7f3d0; color: #065f46; }
+.alert-warning { background-color: #fffbeb; border-color: #fde68a; color: #92400e; }
+.alert-danger  { background-color: #fff1f2; border-color: #fecaca; color: #991b1b; }
+
+/* =============================================
+   MODAL SPACING  (.sh-modal)
+   Apply class="modal sh-modal ..." in partials
+   to get improved chrome. Existing modal-xs
+   and ajax-modal functionality unchanged.
+   ============================================= */
+
+.sh-modal .modal-content {
+    border: none;
+    border-radius: var(--sh-radius-lg);
+    box-shadow: 0 20px 25px rgba(0, 0, 0, .12), 0 8px 10px rgba(0, 0, 0, .08);
+}
+
+.sh-modal .modal-header {
+    background-color: var(--sh-surface);
+    border-bottom: 1px solid var(--sh-border);
+    border-radius: var(--sh-radius-lg) var(--sh-radius-lg) 0 0;
+    padding: .625rem 1.25rem;
+}
+
+.sh-modal .modal-header .modal-title {
+    font-size: .95rem;
+    font-weight: 600;
+    color: var(--sh-text-primary);
+}
+
+.sh-modal .modal-body {
+    padding: 1.25rem;
+}
+
+.sh-modal .modal-footer {
+    background-color: var(--sh-surface);
+    border-top: 1px solid var(--sh-border);
+    border-radius: 0 0 var(--sh-radius-lg) var(--sh-radius-lg);
+    padding: .625rem 1.25rem;
+    gap: .5rem;
+}
+
+/* =============================================
+   NAV PILLS  (Planner / Registration tabs)
+   ============================================= */
+
+.nav-pills .nav-link {
+    border-radius: var(--sh-radius-sm);
+    font-size: .875rem;
+    font-weight: 500;
+    color: var(--sh-text-secondary);
+    padding: .375rem .75rem;
+    transition: background-color var(--sh-transition), color var(--sh-transition);
+}
+
+.nav-pills .nav-link:hover:not(.active) {
+    background-color: var(--sh-border-light);
+    color: var(--sh-text-primary);
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+    background-color: var(--sh-primary) !important;
+    border-color: var(--sh-primary) !important;
+    color: #fff !important;
+}
+
+/* =============================================
+   ICON SIZE UTILITIES  (.sh-icon-*)
+   Replaces repeated style="font-size:1.2rem;color:gray"
+   ============================================= */
+
+.sh-icon-sm { font-size: 1.1rem !important; color: var(--sh-text-secondary); }
+.sh-icon-md { font-size: 1.3rem !important; color: var(--sh-text-secondary); }
+.sh-icon-lg { font-size: 2rem   !important; color: var(--sh-text-secondary); }
+.sh-icon-xl { font-size: 4rem   !important; color: var(--sh-text-secondary); }
+
+/* =============================================
+   DRAG-AND-DROP COLUMNS  (Index live view)
+   The ids Groups_1..4 and JS drop handlers
+   are not touched – only visual border.
+   ============================================= */
+
+.sh-drop-col {
+    border-right: 1px dashed var(--sh-border);
+    min-height: 78vh;
+}
+
+.sh-drop-col:last-child {
+    border-right: none;
+}
+
+/* =============================================
+   FORM CONTROLS  (global polish)
+   ============================================= */
+
+.form-control,
+.form-select {
+    border-radius: var(--sh-radius-sm);
+    border: 1px solid var(--sh-border);
+    font-size: .875rem;
+    color: var(--sh-text-primary);
+    transition: border-color var(--sh-transition), box-shadow var(--sh-transition);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .08);
+}
+
+/* =============================================
+   BUTTONS  (global polish)
+   ============================================= */
+
+.btn {
+    border-radius: var(--sh-radius-sm);
+    font-size: .875rem;
+    font-weight: 500;
+    transition: background-color var(--sh-transition),
+                border-color var(--sh-transition),
+                box-shadow var(--sh-transition);
+}
+
+.btn-primary {
+    background-color: var(--sh-primary);
+    border-color: var(--sh-primary);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: var(--sh-primary-hover);
+    border-color: var(--sh-primary-hover);
+}
+
+.btn-sm {
+    font-size: .8rem;
+    padding: .25rem .6rem;
+}
+
+/* =============================================
+   MODAL CHROME  (global – applies to all modals)
+   ============================================= */
+
+.modal-content {
+    border: 1px solid var(--sh-border);
+    border-radius: var(--sh-radius-lg);
+    box-shadow: var(--sh-shadow-md);
+    overflow: hidden;
+}
+
+.modal-header {
+    background-color: var(--sh-surface);
+    border-bottom: 1px solid var(--sh-border);
+    padding: .625rem 1.25rem;
+    align-items: center;
+    min-height: 0;
+}
+
+.modal-title {
+    font-size: .9rem;
+    font-weight: 600;
+    color: var(--sh-text-primary);
+    line-height: 1.3;
+}
+
+.modal-body {
+    padding: 1rem 1.25rem;
+}
+
+.modal-footer {
+    background-color: var(--sh-surface);
+    border-top: 1px solid var(--sh-border);
+    padding: .625rem 1.25rem;
+    gap: .5rem;
+}
+
+/* === FORM LABELS & GROUPS INSIDE MODALS =========================== */
+
+.modal .form-group {
+    margin-bottom: .875rem;
+}
+
+.modal .form-group:last-child {
+    margin-bottom: 0;
+}
+
+.modal .form-group > label {
+    font-size: .72rem;
+    font-weight: 600;
+    color: var(--sh-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: .045em;
+    margin-bottom: .3rem;
+    display: block;
+}
+
+.modal .form-control[readonly],
+.modal .form-select[readonly] {
+    background-color: var(--sh-surface);
+    color: var(--sh-text-secondary);
+    border-color: var(--sh-border-light);
+    cursor: default;
+}
+
+/* === HORIZONTAL FORM DIVIDER ====================================== */
+
+.sh-form-divider {
+    border: none;
+    border-top: 1px solid var(--sh-border);
+    margin: .875rem 0;
+}
+
+/* Global hr: override Bootstrap's faint default with design token */
+hr {
+    border: 0;
+    border-top: 1px solid var(--sh-border) !important;
+    margin: .875rem 0;
+    opacity: 1;
+}
+
+/* === DELETE / DANGER CONFIRMATION ZONE ============================ */
+
+.sh-danger-zone {
+    background-color: #fff5f5;
+    border: 1px solid #fecaca;
+    border-radius: var(--sh-radius);
+    padding: .75rem 1rem;
+    margin-top: .5rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.sh-danger-zone .form-check-label {
+    font-size: .875rem;
+    color: #991b1b;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.sh-danger-zone .form-check-input {
+    flex-shrink: 0;
+    margin-top: 0;
+    cursor: pointer;
+}
+
+/* === LOGIN CARD =================================================== */
+
+.sh-login-card {
+    background: var(--sh-surface-card);
+    border: 1px solid var(--sh-border);
+    border-radius: var(--sh-radius-lg);
+    box-shadow: var(--sh-shadow-md);
+    padding: 2rem 2rem 1.75rem;
+    margin-top: 2.5rem;
+}
+
+.sh-login-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--sh-text-primary);
+    text-align: center;
+    margin-bottom: 1.5rem;
+    letter-spacing: -.01em;
+}
+
+.sh-login-title .bi {
+    color: var(--sh-primary);
+}
+
+.sh-login-card .form-group > label {
+    font-size: .72rem;
+    font-weight: 600;
+    color: var(--sh-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: .045em;
+    margin-bottom: .3rem;
+    display: block;
+}
+
+/* =============================================
+   DATATABLES VISUAL OVERRIDES
+   Table IDs (#UserTable, #GroupTable) and all
+   DataTable() init calls are untouched.
+   ============================================= */
+
+.dataTables_wrapper {
+    font-size: .875rem;
+}
+
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter {
+    padding: .5rem .75rem;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    border: 1px solid var(--sh-border);
+    border-radius: var(--sh-radius-sm);
+    padding: .2rem .5rem;
+    font-size: .8rem;
+    color: var(--sh-text-primary);
+}
+
+.dataTables_wrapper .dataTables_length select {
+    border: 1px solid var(--sh-border);
+    border-radius: var(--sh-radius-sm);
+    padding: .15rem .35rem;
+    font-size: .8rem;
+    color: var(--sh-text-primary);
+}
+
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate {
+    padding: .4rem .75rem;
+    background-color: var(--sh-surface);
+    border-top: 1px solid var(--sh-border-light);
+    color: var(--sh-text-secondary);
+    font-size: .8rem;
+}
+
+table.dataTable {
+    width: 100% !important;
+    border-collapse: collapse !important;
+}
+
+table.dataTable thead th,
+table.dataTable thead td {
+    font-size: .75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--sh-text-secondary);
+    background-color: var(--sh-surface);
+    border-bottom: 2px solid var(--sh-border) !important;
+    padding: .6rem .75rem;
+    white-space: nowrap;
+}
+
+table.dataTable tbody tr td {
+    font-size: .875rem;
+    color: var(--sh-text-primary);
+    vertical-align: middle;
+    border-bottom: 1px solid var(--sh-border-light) !important;
+    padding: .55rem .75rem;
+}
+
+table.dataTable tbody tr:hover td {
+    background-color: #f0f7ff !important;
+}
+
+/* =============================================
+   ROW ACTION MENU  (.sh-row-menu)
+   Replaces nav navbar-nav dropdown in table rows.
+   data-bs-toggle="ajax-modal" and data-bs-url
+   attributes are preserved exactly.
+   ============================================= */
+
+.sh-row-menu-cell {
+    width: 1%;
+    white-space: nowrap;
+    text-align: right;
+    padding: .3rem .5rem !important;
+}
+
+.sh-row-menu-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--sh-text-muted);
+    padding: .25rem .35rem;
+    line-height: 1;
+    border-radius: var(--sh-radius-sm);
+    transition: background-color var(--sh-transition),
+                border-color var(--sh-transition),
+                color var(--sh-transition);
+}
+
+.sh-row-menu-btn:hover,
+.sh-row-menu-btn:focus,
+.sh-row-menu-btn.show {
+    background: var(--sh-surface);
+    border-color: var(--sh-border);
+    color: var(--sh-text-primary);
+    box-shadow: none;
+    outline: none;
+}
+
+.sh-row-menu-btn::after {
+    display: none;
+}
+
+.sh-row-menu-list {
+    min-width: 7rem;
+    padding: .25rem 0;
+    border: 1px solid var(--sh-border);
+    border-radius: var(--sh-radius);
+    box-shadow: var(--sh-shadow-md);
+}
+
+.sh-row-menu-list .dropdown-item {
+    font-size: .835rem;
+    padding: .4rem .875rem;
+    color: var(--sh-text-primary);
+    display: flex;
+    align-items: center;
+}
+
+.sh-row-menu-list .dropdown-item:hover {
+    background-color: var(--sh-surface);
+    color: var(--sh-primary);
+}
+
+.sh-row-menu-list .dropdown-item.sh-row-menu-danger {
+    color: #dc2626;
+}
+
+.sh-row-menu-list .dropdown-item.sh-row-menu-danger:hover {
+    background-color: #fff5f5;
+    color: #b91c1c;
+}
+
+/* =============================================
+   ALERT FLEX LAYOUT  (.sh-alert)
+   Replaces table-based layout inside .alert.
+   alert-info/success/warning/danger colors kept.
+   ============================================= */
+
+.sh-alert {
+    display: flex;
+    align-items: center;
+    gap: .625rem;
+    padding: .6rem .875rem;
+    border-radius: var(--sh-radius);
+}
+
+.sh-alert-icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.sh-alert-body {
+    flex: 1;
+    font-size: .875rem;
+}
+
+/* === PUBLIC REGISTRATION FORM (Tilmelding) ======================== */
+.RuleFailed { color: lightcoral !important; }
+.RulePassed { color: green; }
+
+/* === BORDERLESS TEXTAREA ========================================== */
+.sh-textarea-plain { border: none !important; resize: none; }
+
+/* === TALL MODAL (90 vh) =========================================== */
+.sh-modal-tall { height: 90vh; }
+
+/* === VERTICAL DIVIDER ============================================= */
+.sh-vdivider {
+    min-height: 200px;
+    border-left: 1px solid var(--sh-border);
+    margin-left: .625rem;
+}
+
+/* === DRAG-DROP PLACEHOLDER ZONE ================================== */
+.sh-droptarget { min-height: 40px; }
+
+/* === COMPACT NUMBER INPUT ======================================== */
+.sh-input-count {
+    width: 50px;
+    text-align: right;
+}
+
+/* === READONLY SUMMARY INPUT (green = kirkenote selected) ========= */
+.sh-input-summary { color: green; }
+
+/* === SUBGROUP LIST BUTTON ======================================== */
+.sh-subgroup-btn {
+    width: 100%;
+    text-align: left  !important;
+    border: 1px solid var(--sh-border) !important;
+}
+
+/* === SMALL FORM-ELEMENT LABEL ==================================== */
+.sh-form-label-sm {
+    font-size: .75rem;
+    color: var(--sh-text-secondary);
 }

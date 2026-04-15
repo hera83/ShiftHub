@@ -66,13 +66,13 @@
             {
                 <tr>
                     <td align="left" valign="middle">
-                        <button type="button" id="Sub_@Html.Raw($"{aRow["Id"]}")" class="btn light" onclick="SubGroupSelect(@Html.Raw($"{aRow["Id"]}"))" style="width: 100%; text-align: left; border: 1px solid lightgray;" title="@Html.Raw($"{aRow["Description"]}")">
+                        <button type="button" id="Sub_@Html.Raw($"{aRow["Id"]}")" class="btn light sh-subgroup-btn" onclick="SubGroupSelect(@Html.Raw($"{aRow["Id"]}"))" title="@Html.Raw($"{aRow["Description"]}")">
                             <b>@Html.Raw($"{aRow["Name"]}")</b>
                         </button>
                     </td>
                     <td align="right" valign="middle" style="width: 30px;">
                         <button type="button" class="btn lightButton" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("DeleteSubGroup", "Home", new { SubGroupId = Convert.ToInt32($"{aRow["Id"]}") })" title="Slet gruppe" @if ($"{aRow["Activated"]}" == "1" && User.IsInRole("Administrator") == false && User.IsInRole("InCharge") == false) { @Html.Raw(" disabled") }>
-                            <center><i class="bi bi-trash2" style="font-size: 1.2rem; color: gray;"></i></center>
+                            <center><i class="bi bi-trash2 sh-icon-sm"></i></center>
                         </button>
                     </td>
                 </tr>
@@ -87,7 +87,7 @@
             }
             </table>
             <button type="button" class="btn lightButton" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("AddSubGroup", "Home", new { })" title="">
-                <center><i class="bi bi-patch-plus" style="font-size: 1.2rem; color: gray;"></i></center>
+                <center><i class="bi bi-patch-plus sh-icon-sm"></i></center>
             </button>
         </div>
         <div class="col my-1 m-1" id="workContainerId" style="display: none;">
@@ -113,225 +113,178 @@
                 <div id="AlertPlaceholder"></div>
                 <div class="tab-pane fade show active" id="one" role="tabpanel" aria-labelledby="tab-one">
                     <!-- Dage -->
-                    <table width="100%">
-                        <tr>
-                            <td width="70%" valign="top">
-                                <div class="row">
-                                    <div class="col">
-                                        <button type="button" class="btn lightButton Activated LederAct" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("SubDaysAdd", "Home", new { })" title="Tilføj dag(e)">
-                                            <i class="bi bi-calendar-plus" style="font-size: 1.2rem; color: gray;"></i>
-                                        </button>
-                                    </div>
-                                    <div class="col" align="right">
-                                        <input class="form-control" type="text" id="daysFilterId" placeholder="Søg" onkeyup="daysUpdate()" style="width: 180px;" />
-                                    </div>
+                    <div class="row g-3 mt-1">
+                        <div class="col-8">
+                            <div class="row mb-2">
+                                <div class="col">
+                                    <button type="button" class="btn lightButton Activated LederAct sh-toolbar-btn" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("SubDaysAdd", "Home", new { })" title="Tilføj dag(e)">
+                                        <i class="bi bi-calendar-plus sh-icon-sm"></i>
+                                    </button>
                                 </div>
-                                <table class="table" id="DaysList">
-                                </table>
-                            </td>
-                            <td width="30%" valign="top">
-                                <div style="margin: 0px 0px 0px 15px;">
-                                    <div class="card">
-                                        <div class="card-header">
-                                            Døgnrytme
-                                        </div>
-                                        <div class="card-body">
-                                            <table width="100%">
-                                                <tr>
-                                                    <td width="49%">
-                                                        <input class="form-control form-control-sm Activated" type="time" value="00:00" onchange="daysCycleUpdate('change')" id="daysCycleStartId" title="OBS: Når denne ændres slettes alle vagter og behov!" />
-                                                    </td>
-                                                    <td width="2%"></td>
-                                                    <td width="49%">
-                                                        <input class="form-control form-control-sm" type="time" value="23:59" id="daysCycleEndId" readonly />
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                    </div>
-                                    <div class="card" style="margin-top: 10px;">
-                                        <div class="card-header">
-                                            Noter
-                                        </div>
-                                        <div class="card-body">
-                                            <textarea rows="12" style="width: 100%; border: none;" onkeyup="daysNoteUpdate()" id="daysNoteId"></textarea>
-                                        </div>
-                                    </div>
+                                <div class="col" align="right">
+                                    <input class="form-control form-control-sm sh-search" type="text" id="daysFilterId" placeholder="Søg" onkeyup="daysUpdate()" />
                                 </div>
-                            </td>
-                        </tr>
-                    </table>
+                            </div>
+                            <table class="table" id="DaysList">
+                            </table>
+                        </div>
+                        <div class="col-4">
+                            <div class="card">
+                                <div class="card-header">Døgnrytme</div>
+                                <div class="card-body">
+                                    <table width="100%">
+                                        <tr>
+                                            <td width="49%">
+                                                <input class="form-control form-control-sm Activated" type="time" value="00:00" onchange="daysCycleUpdate('change')" id="daysCycleStartId" title="OBS: Når denne ændres slettes alle vagter og behov!" />
+                                            </td>
+                                            <td width="2%"></td>
+                                            <td width="49%">
+                                                <input class="form-control form-control-sm" type="time" value="23:59" id="daysCycleEndId" readonly />
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="card mt-2">
+                                <div class="card-header">Noter</div>
+                                <div class="card-body">
+                                    <textarea rows="10" class="w-100 sh-textarea-plain" onkeyup="daysNoteUpdate()" id="daysNoteId"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="tab-pane fade" id="two" role="tabpanel" aria-labelledby="tab-two">
                     <!-- Vagter -->
-                    <table width="100%">
-                        <tr>
-                            <td width="70%" valign="top">
-                                <div class="row">
-                                    <div class="col">
-                                        <button type="button" class="btn lightButton Activated LederAct" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("SubShiftsAdd", "Home", new { })" title="Opret vagt">
-                                            <i class="bi bi-person-badge" style="font-size: 1.2rem; color: gray;"></i>
-                                        </button>
-                                        <button type="button" class="btn lightButton Activated LederAct" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("SubShiftsView", "Home", new { })" title="Se en samtælling af vagter">
-                                            <i class="bi bi-bar-chart" style="font-size: 1.2rem; color: gray;"></i>
-                                        </button>
-                                    </div>
-                                    <div class="col" align="right">
-                                        <input class="form-control" type="text" id="shiftsFilterId" placeholder="Søg" onkeyup="shiftsUpdate()" style="width: 180px;" />
-                                    </div>
+                    <div class="row g-3 mt-1">
+                        <div class="col-8">
+                            <div class="row mb-2">
+                                <div class="col">
+                                    <button type="button" class="btn lightButton Activated LederAct sh-toolbar-btn" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("SubShiftsAdd", "Home", new { })" title="Opret vagt">
+                                        <i class="bi bi-person-badge sh-icon-sm"></i>
+                                    </button>
+                                    <button type="button" class="btn lightButton Activated LederAct sh-toolbar-btn" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("SubShiftsView", "Home", new { })" title="Se en samtælling af vagter">
+                                        <i class="bi bi-bar-chart sh-icon-sm"></i>
+                                    </button>
                                 </div>
-                                <table class="table" id="ShiftsList">
-                                </table>
-                            </td>
-                            <td width="30%" valign="top">
-                                <div style="margin: 0px 0px 0px 15px;">
-                                    <div class="card">
-                                        <div class="card-header">
-                                            Noter
-                                        </div>
-                                        <div class="card-body">
-                                            <textarea rows="12" style="width: 100%; border: none;" onkeyup="shiftsNoteUpdate()" id="shiftsNoteId"></textarea>
-                                        </div>
-                                    </div>
+                                <div class="col" align="right">
+                                    <input class="form-control form-control-sm sh-search" type="text" id="shiftsFilterId" placeholder="Søg" onkeyup="shiftsUpdate()" />
                                 </div>
-                            </td>
-                        </tr>
-                    </table>
+                            </div>
+                            <table class="table" id="ShiftsList">
+                            </table>
+                        </div>
+                        <div class="col-4">
+                            <div class="card">
+                                <div class="card-header">Noter</div>
+                                <div class="card-body">
+                                    <textarea rows="12" class="w-100 sh-textarea-plain" onkeyup="shiftsNoteUpdate()" id="shiftsNoteId"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="tab-pane fade" id="three" role="tabpanel" aria-labelledby="tab-three">
                     <!-- Behov -->
-                    <table width="100%">
-                        <tr>
-                            <td width="70%" valign="top">
-                                <div class="row">
-                                    <div class="col" align="right">
-                                        <input class="form-control" type="text" id="needsFilterId" placeholder="Søg" onkeyup="needsUpdate()" style="width: 180px;" />
-                                    </div>
+                    <div class="row g-3 mt-1">
+                        <div class="col-8">
+                            <div class="row mb-2">
+                                <div class="col" align="right">
+                                    <input class="form-control form-control-sm sh-search" type="text" id="needsFilterId" placeholder="Søg" onkeyup="needsUpdate()" />
                                 </div>
-                                <table class="table" id="NeedsList">
-                                </table>
-                            </td>
-                            <td width="30%" valign="top">
-                                <div style="margin: 0px 0px 0px 15px;">
-                                    <div class="card">
-                                        <div class="card-header">
-                                            Regler
-                                        </div>
-                                        <div class="card-body">
-                                            <table border="0" width="100%">
-                                                <tr>
-                                                    <td align="left" valign="middle">
-                                                        <u>Weekend vagt(er)</u>
-                                                    </td>
-                                                    <td align="right" valign="middle">
-                                                        <input type="checkbox" class="form-check-input Activated LederAct" id="needsRuleWeekend_Active" onclick="needsRuleWeekend(this)" />
-                                                    </td>
-                                                </tr>
-                                                <tr id="needsRuleWeekend_Container" style="display: none;">
-                                                    <td align="left" valign="middle">
-                                                        <input type="number" class="form-control form-control-sm Activated LederAct" id="needsRuleWeekend_Count" value="1" min="1" style="width: 50px; text-align: right;" onchange="needsRuleWeekendSave()" />
-                                                    </td>
-                                                    <td align="left" valign="middle">
-                                                        &nbsp;<i>Antal dage</i>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td align="left" valign="middle">
-                                                        <u>Antal timer</u>
-                                                    </td>
-                                                    <td align="right" valign="middle">
-                                                        <input type="checkbox" class="form-check-input Activated LederAct" id="needsRuleHours_Active" onclick="needsRuleHours(this)" />
-                                                    </td>
-                                                </tr>
-                                                <tr id="needsRuleHours_Container" style="display: none;">
-                                                    <td align="left" valign="middle">
-                                                        <input type="number" class="form-control form-control-sm Activated LederAct" id="needsRuleHours_Count" value="1" min="1" style="width: 50px; text-align: right;" onchange="needsRuleHoursSave()" />
-                                                    </td>
-                                                    <td align="left" valign="middle">
-                                                        &nbsp;<i>Antal timer</i>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td align="left" valign="middle">
-                                                        <u>Særlig Key</u>
-                                                    </td>
-                                                    <td align="right" valign="middle">
-                                                        <input type="checkbox" class="form-check-input Activated LederAct" id="needsRuleKeys_Active" onclick="needsRuleKeys(this)" />
-                                                    </td>
-                                                </tr>
-                                                <tr id="needsRuleKeys_Container" style="display: none;">
-                                                    <td colspan="2" align="left" valign="middle">
-                                                        <div id="needsRuleKeysView">
-                                                        </div>
-                                                        <table width="100%">
-                                                            <tr>
-                                                                <td align="center" valign="middle">
-                                                                    <button type="button" class="btn Activated LederAct" onclick="needsRuleKeysAdd()" id="needsRuleKeyAddButton"><i class="bi bi-plus-circle" style="font-size: 1.3rem;"></i></button>
-                                                                </td>
-                                                            </tr>
-                                                        </table>
-                                                    </td>
-                                                </tr>
-
-                                            </table>
-                                        </div>
-                                    </div>
-                                    <div class="card" style="margin-top: 10px;">
-                                        <div class="card-header">
-                                            Noter
-                                        </div>
-                                        <div class="card-body">
-                                            <textarea rows="12" style="width: 100%; border: none;" onkeyup="needsNoteUpdate()" id="needsNoteId"></textarea>
-                                        </div>
-                                    </div>
+                            </div>
+                            <table class="table" id="NeedsList">
+                            </table>
+                        </div>
+                        <div class="col-4">
+                            <div class="card">
+                                <div class="card-header">Regler</div>
+                                <div class="card-body">
+                                    <table border="0" width="100%">
+                                        <tr>
+                                            <td align="left" valign="middle"><u>Weekend vagt(er)</u></td>
+                                            <td align="right" valign="middle">
+                                                <input type="checkbox" class="form-check-input Activated LederAct" id="needsRuleWeekend_Active" onclick="needsRuleWeekend(this)" />
+                                            </td>
+                                        </tr>
+                                        <tr id="needsRuleWeekend_Container" style="display: none;">
+                                            <td align="left" valign="middle">
+                                                <input type="number" class="form-control form-control-sm Activated LederAct sh-input-count" id="needsRuleWeekend_Count" value="1" min="1" onchange="needsRuleWeekendSave()" />
+                                            </td>
+                                            <td align="left" valign="middle">&nbsp;<i>Antal dage</i></td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left" valign="middle"><u>Antal timer</u></td>
+                                            <td align="right" valign="middle">
+                                                <input type="checkbox" class="form-check-input Activated LederAct" id="needsRuleHours_Active" onclick="needsRuleHours(this)" />
+                                            </td>
+                                        </tr>
+                                        <tr id="needsRuleHours_Container" style="display: none;">
+                                            <td align="left" valign="middle">
+                                                <input type="number" class="form-control form-control-sm Activated LederAct sh-input-count" id="needsRuleHours_Count" value="1" min="1" onchange="needsRuleHoursSave()" />
+                                            </td>
+                                            <td align="left" valign="middle">&nbsp;<i>Antal timer</i></td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left" valign="middle"><u>Særlig Key</u></td>
+                                            <td align="right" valign="middle">
+                                                <input type="checkbox" class="form-check-input Activated LederAct" id="needsRuleKeys_Active" onclick="needsRuleKeys(this)" />
+                                            </td>
+                                        </tr>
+                                        <tr id="needsRuleKeys_Container" style="display: none;">
+                                            <td colspan="2" align="left" valign="middle">
+                                                <div id="needsRuleKeysView"></div>
+                                                <table width="100%">
+                                                    <tr>
+                                                        <td align="center" valign="middle">
+                                                            <button type="button" class="btn Activated LederAct" onclick="needsRuleKeysAdd()" id="needsRuleKeyAddButton"><i class="bi bi-plus-circle sh-icon-md"></i></button>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
                                 </div>
-                            </td>
-                        </tr>
-                    </table>
+                            </div>
+                            <div class="card mt-2">
+                                <div class="card-header">Noter</div>
+                                <div class="card-body">
+                                    <textarea rows="12" class="w-100 sh-textarea-plain" onkeyup="needsNoteUpdate()" id="needsNoteId"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="tab-pane fade" id="four" role="tabpanel" aria-labelledby="tab-four">
                     <!-- Brugere -->
-                    <table width="100%">
-                        <tr>
-                            <td>
-                                <div class="row">
-                                    <div class="col">
-                                        <button type="button" class="btn lightButton Activated LederAct" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("SubStaffAdd", "Home", new { })" title="Tilføj bruger">
-                                            <i class="bi bi-person-add" style="font-size: 1.2rem; color: gray;"></i>
-                                        </button>
-                                    </div>
-                                    <div class="col" align="right">
-                                        <input class="form-control" type="text" id="staffFilterId" placeholder="Søg" onkeyup="staffUpdate()" style="width: 180px;" />
-                                    </div>
-                                </div>
-                                <table class="table" id="StaffList">
-                                </table>
-                            </td>
-                        </tr>
+                    <div class="row mb-2 mt-1">
+                        <div class="col">
+                            <button type="button" class="btn lightButton Activated LederAct sh-toolbar-btn" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("SubStaffAdd", "Home", new { })" title="Tilføj bruger">
+                                <i class="bi bi-person-add sh-icon-sm"></i>
+                            </button>
+                        </div>
+                        <div class="col" align="right">
+                            <input class="form-control form-control-sm sh-search" type="text" id="staffFilterId" placeholder="Søg" onkeyup="staffUpdate()" />
+                        </div>
+                    </div>
+                    <table class="table" id="StaffList">
                     </table>
                 </div>
                 <div class="tab-pane fade" id="five" role="tabpanel" aria-labelledby="tab-five">
                     <!-- Tilmelding -->
-                    <table width="100%">
-                        <tr>
-                            <td id="ElementList" ondrop="formDrop(event)" ondragover="formAllowDrop(event)">
-                            </td>
-                        </tr>
-                        <tr><td height="20px"></td></tr>
-                        <tr>
-                            <td align="center" valign="middle">
-                                <button class="btn lightButton Activated LederAct" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("SubFormElements", "Home", new { })" title="Tilføj element">
-                                    <i class="bi bi-plus-circle" style="font-size: 2rem; color: gray;"></i>
-                                </button>
-                                <button class="btn lightButton Activated LederAct" onclick="formSave()" title="Gem tilmelding">
-                                    <i class="bi bi-floppy" style="font-size: 2rem; color: gray;"></i>
-                                </button>
-                                <button class="btn lightButton Activated" onclick="formActivate()" title="Aktiver & Send">
-                                    <i class="bi bi-browser-chrome" style="font-size: 2rem; color: gray;"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    </table>
+                    <div id="ElementList" ondrop="formDrop(event)" ondragover="formAllowDrop(event)" class="mb-3 sh-droptarget">
+                    </div>
+                    <div class="text-center mt-2">
+                        <button class="btn lightButton Activated LederAct sh-toolbar-btn" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("SubFormElements", "Home", new { })" title="Tilføj element">
+                            <i class="bi bi-plus-circle sh-icon-lg"></i>
+                        </button>
+                        <button class="btn lightButton Activated LederAct sh-toolbar-btn" onclick="formSave()" title="Gem tilmelding">
+                            <i class="bi bi-floppy sh-icon-lg"></i>
+                        </button>
+                        <button class="btn lightButton Activated sh-toolbar-btn" onclick="formActivate()" title="Aktiver & Send">
+                            <i class="bi bi-browser-chrome sh-icon-lg"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

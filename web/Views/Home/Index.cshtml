@@ -57,122 +57,89 @@
 </div>
 
 <div class="container">
-    <div class="row">
-        <div class="col" align="left">
-            <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="planId" onclick="viewChange()">
-                <label class="form-check-label" for="planId">Udvid</label>
-            </div>
+    <div class="sh-page-header">
+        <i class="bi bi-grid-1x2"></i>
+        <span>Overblik</span>
+    </div>
+    <div class="sh-action-bar">
+        <div class="form-check form-switch mb-0">
+            <input class="form-check-input" type="checkbox" id="planId" onclick="viewChange()">
+            <label class="form-check-label" for="planId">Udvid</label>
         </div>
     </div>
 
     <div class="container" id="viewOne" style="display: block;">
-        <br /><br />
-        <table width="100%">
-            <tr>
-                <td align="center", valign="top">
-                    <table width="80%">
-                        <tr>
-                            <td width="33%" style="height: 25vh;">
-                                <canvas id="myChart1"></canvas>
-                            </td>
-                            <td width="34%">
-                                <canvas id="myChart2"></canvas>
-                            </td>
-                            <td width="33%">
-                                <canvas id="myChart3"></canvas>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="3" align="center" valign="bottom" height="60px">
-                                <b>Tilmeldinger</b>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="3" style="height: 25vh;">
-                                <canvas id="myChart4"></canvas>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
+        <div class="row justify-content-center g-3 mb-3 mt-2">
+            <div class="col-sm-4">
+                <div class="sh-card p-2" style="height: 22vh;">
+                    <canvas id="myChart1"></canvas>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="sh-card p-2" style="height: 22vh;">
+                    <canvas id="myChart2"></canvas>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="sh-card p-2" style="height: 22vh;">
+                    <canvas id="myChart3"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-sm-10">
+                <div class="sh-card p-3">
+                    <p class="sh-section-title text-center mb-2">Tilmeldinger</p>
+                    <div style="height: 25vh;">
+                        <canvas id="myChart4"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="container" id="viewTwo" style="display: none;">
         <div class="row">
             <div class="col-2">
-                <h5><i class="bi bi-bezier2"> Poster</i></h5>
-                <hr />
-                <table border="0" width="100%">
-                    <tr>
-                        <td align="center">
-                            <button type="button" class="btn lightButton groupFunction" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("SubPostCheckIn", "Home", new { })" title="CheckIn" disabled>
-                                <center><i class="bi bi-person-add" style="font-size: 1.2rem; color: gray;"></i></center>
-                            </button>
-                            <button type="button" class="btn lightButton groupFunction" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("SubPostCreatePost", "Home", new { })" title="Opret post" disabled>
-                                <center><i class="bi bi-patch-plus" style="font-size: 1.2rem; color: gray;"></i></center>
-                            </button>
-                            <button type="button" class="btn lightButton " onclick="sms()" title="Bruger advicering via sms" disabled>
-                                <center><i id="Sms" class="bi bi-phone-vibrate" style="font-size: 1.2rem; color: gray;"></i></center>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td align="center">
-                            <button type="button" class="btn lightButton groupFunction" onclick="mute()" title="Mute site" disabled>
-                                <center><i id="Mute" class="bi bi-volume-mute" style="font-size: 1.2rem; color: gray;"></i></center>
-                            </button>
-                            <button type="button" class="btn lightButton groupFunction" onclick="list()" title="Udvid alt" disabled>
-                                <center><i id="List" class="bi bi-layers" style="font-size: 1.2rem; color: gray;"></i></center>
-                            </button>
-                            <button type="button" class="btn lightButton groupFunction" onclick="update()" title="Automatisk opdatering" disabled>
-                                <center><i id="Update" class="bi bi-arrow-repeat" style="font-size: 1.2rem; color: gray;"></i></center>
-                            </button>
-                        </td>
-                    </tr>
-                </table>
-                <hr />
-                <table border="0" width="100%">
-                    <tr>
-                        <td>
-                            <input type="text" class="form-control groupFunction" placeholder="Søg her" onchange="updateOverview()" onkeyup="updateOverview()" id="SearchId" disabled />
-                        </td>
-                    </tr>
-                </table>
-                <hr />
-                <table border="0" width="100%">
-                    <tr>
-                        <td>
-                            <div class="row">
-                                <div id="Alerts_View" class="col">
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div id="Groups_0" class="col" ondrop="drop(event)" ondragover="allowDrop(event)" style="height: auto; padding-bottom: 15px;">
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-                <hr />
-                <table border="0" width="100%">
-                    <tr>
-                        <td>
-                            <select class="form-control" onchange="updateSubGroup(this)" id="SubGroup">
-                            </select>
-                        </td>
-                    </tr>
-                </table>
+                <h6 class="sh-section-title"><i class="bi bi-bezier2 me-1"></i>Poster</h6>
+                <hr class="sh-form-divider" />
+                <div class="d-flex flex-wrap gap-1 justify-content-center">
+                    <button type="button" class="btn lightButton groupFunction sh-toolbar-btn" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("SubPostCheckIn", "Home", new { })" title="CheckIn" disabled>
+                        <i class="bi bi-person-add sh-icon-sm"></i>
+                    </button>
+                    <button type="button" class="btn lightButton groupFunction sh-toolbar-btn" data-bs-toggle="ajax-modal" data-bs-url="@Url.Action("SubPostCreatePost", "Home", new { })" title="Opret post" disabled>
+                        <i class="bi bi-patch-plus sh-icon-sm"></i>
+                    </button>
+                    <button type="button" class="btn lightButton sh-toolbar-btn" onclick="sms()" title="Bruger advicering via sms" disabled>
+                        <i id="Sms" class="bi bi-phone-vibrate" style="font-size: 1.2rem; color: gray;"></i>
+                    </button>
+                    <button type="button" class="btn lightButton groupFunction sh-toolbar-btn" onclick="mute()" title="Mute site" disabled>
+                        <i id="Mute" class="bi bi-volume-mute" style="font-size: 1.2rem; color: gray;"></i>
+                    </button>
+                    <button type="button" class="btn lightButton groupFunction sh-toolbar-btn" onclick="list()" title="Udvid alt" disabled>
+                        <i id="List" class="bi bi-layers" style="font-size: 1.2rem; color: gray;"></i>
+                    </button>
+                    <button type="button" class="btn lightButton groupFunction sh-toolbar-btn" onclick="update()" title="Automatisk opdatering" disabled>
+                        <i id="Update" class="bi bi-arrow-repeat" style="font-size: 1.2rem; color: gray;"></i>
+                    </button>
+                </div>
+                <hr class="sh-form-divider" />
+                <input type="text" class="form-control form-control-sm groupFunction" placeholder="Søg her" onchange="updateOverview()" onkeyup="updateOverview()" id="SearchId" disabled />
+                <hr class="sh-form-divider" />
+                <div id="Alerts_View"></div>
+                <div id="Groups_0" ondrop="drop(event)" ondragover="allowDrop(event)" class="pb-3"></div>
+                <hr class="sh-form-divider" />
+                <select class="form-select form-select-sm" onchange="updateSubGroup(this)" id="SubGroup">
+                </select>
             </div>
             <div class="col my-1 m-1">
                 <div class="row">
-                    <div id="Groups_1" class="col" ondrop="drop(event)" ondragover="allowDrop(event)" style="border-right: 1px dashed lightgray; height: 78vh;">
+                    <div id="Groups_1" class="col sh-drop-col" ondrop="drop(event)" ondragover="allowDrop(event)">
                     </div>
-                    <div id="Groups_2" class="col" ondrop="drop(event)" ondragover="allowDrop(event)" style="border-right: 1px dashed lightgray; height: 78vh;">
+                    <div id="Groups_2" class="col sh-drop-col" ondrop="drop(event)" ondragover="allowDrop(event)">
                     </div>
-                    <div id="Groups_3" class="col" ondrop="drop(event)" ondragover="allowDrop(event)" style="border-right: 1px dashed lightgray; height: 78vh;">
+                    <div id="Groups_3" class="col sh-drop-col" ondrop="drop(event)" ondragover="allowDrop(event)">
                     </div>
-                    <div id="Groups_4" class="col" ondrop="drop(event)" ondragover="allowDrop(event)" style="min-height: 78vh;">
+                    <div id="Groups_4" class="col sh-drop-col" ondrop="drop(event)" ondragover="allowDrop(event)">
                     </div>
                 </div>
             </div>
