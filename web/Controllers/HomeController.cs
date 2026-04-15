@@ -1131,13 +1131,12 @@ namespace ShiftHub.Controllers
             string filter = Filter?.Trim() ?? string.Empty;
 
             #region Get Data
-            var staffItems = (from registration in _context.SubGroupRegistrations.AsNoTracking()
-                              join shift in _context.SubGroupShifts.AsNoTracking() on registration.ShiftId equals shift.Id
-                              join staff in _context.Staff.AsNoTracking() on registration.StaffId equals staff.Id
-                              where registration.SubGroupId == SubGroupId
+            var staffItems = (from subGroupStaff in _context.SubGroupStaff.AsNoTracking()
+                              join staff in _context.Staff.AsNoTracking() on subGroupStaff.StaffId equals staff.Id
+                              where subGroupStaff.SubGroupId == SubGroupId
                                   && !_context.SubGroupPostMembers.Any(postMember =>
-                                      postMember.SubGroupId == registration.SubGroupId &&
-                                      postMember.StaffId == registration.StaffId &&
+                                      postMember.SubGroupId == subGroupStaff.SubGroupId &&
+                                      postMember.StaffId == subGroupStaff.StaffId &&
                                       postMember.CheckOut == null)
                                   && (EF.Functions.Like(staff.Name, $"%{filter}%") ||
                                       EF.Functions.Like(staff.Key1 ?? string.Empty, $"%{filter}%") ||
@@ -1145,20 +1144,24 @@ namespace ShiftHub.Controllers
                                       EF.Functions.Like(staff.Key3 ?? string.Empty, $"%{filter}%"))
                               select new
                               {
-                                  registration.StaffId,
+                                  subGroupStaff.StaffId,
                                   staff.Name,
-                                  ToDay = shift.SubStartTime.Date == today
+                                  ToDay = _context.SubGroupRegistrations.Any(reg =>
+                                      reg.SubGroupId == subGroupStaff.SubGroupId &&
+                                      reg.StaffId == subGroupStaff.StaffId &&
+                                      _context.SubGroupShifts.Any(shift =>
+                                          shift.Id == reg.ShiftId &&
+                                          shift.SubStartTime.Date == today))
                               })
-                .ToList()
-                .GroupBy(item => new { item.StaffId, item.Name })
-                .Select(group => new
-                {
-                    group.Key.StaffId,
-                    group.Key.Name,
-                    ToDay = group.Any(item => item.ToDay) ? 1 : 0
-                })
                 .OrderBy(item => item.Name)
                 .Take(10)
+                .ToList()
+                .Select(item => new
+                {
+                    item.StaffId,
+                    item.Name,
+                    ToDay = item.ToDay ? 1 : 0
+                })
                 .ToList();
             #endregion
 
