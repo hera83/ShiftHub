@@ -1131,44 +1131,60 @@ namespace ShiftHub.Controllers
             string filter = Filter?.Trim() ?? string.Empty;
 
             #region Get Data
-            var staffItems = (from subGroupStaff in _context.SubGroupStaff.AsNoTracking()
-                              join staff in _context.Staff.AsNoTracking() on subGroupStaff.StaffId equals staff.Id
-                              where subGroupStaff.SubGroupId == SubGroupId
-                                  && !_context.SubGroupPostMembers.Any(postMember =>
-                                      postMember.SubGroupId == subGroupStaff.SubGroupId &&
-                                      postMember.StaffId == subGroupStaff.StaffId &&
-                                      postMember.CheckOut == null)
-                                  && (EF.Functions.Like(staff.Name, $"%{filter}%") ||
-                                      EF.Functions.Like(staff.Key1 ?? string.Empty, $"%{filter}%") ||
-                                      EF.Functions.Like(staff.Key2 ?? string.Empty, $"%{filter}%") ||
-                                      EF.Functions.Like(staff.Key3 ?? string.Empty, $"%{filter}%"))
-                              select new
-                              {
-                                  subGroupStaff.StaffId,
-                                  staff.Name,
-                                  ToDay = _context.SubGroupRegistrations.Any(reg =>
-                                      reg.SubGroupId == subGroupStaff.SubGroupId &&
-                                      reg.StaffId == subGroupStaff.StaffId &&
-                                      _context.SubGroupShifts.Any(shift =>
-                                          shift.Id == reg.ShiftId &&
-                                          shift.SubStartTime.Date == today))
-                              })
+            DateTime todayEnd = today.AddDays(1);
+
+            // Fetch all staff registered for a shift in this subgroup who are not already checked in
+            // Bring to memory first to avoid SQLite translation issues with .Date and nested subqueries
+            var allRegistered = (from registration in _context.SubGroupRegistrations.AsNoTracking()
+                                 join shift in _context.SubGroupShifts.AsNoTracking() on registration.ShiftId equals shift.Id
+                                 join staff in _context.Staff.AsNoTracking() on registration.StaffId equals staff.Id
+                                 where registration.SubGroupId == SubGroupId
+                                 select new
+                                 {
+                                     registration.StaffId,
+                                     staff.Name,
+                                     staff.Key1,
+                                     staff.Key2,
+                                     staff.Key3,
+                                     ShiftStart = shift.SubStartTime
+                                 })
+                .ToList();
+
+            // Exclude already checked-in staff
+            var checkedInStaffIds = _context.SubGroupPostMembers.AsNoTracking()
+                .Where(pm => pm.SubGroupId == SubGroupId && pm.CheckOut == null)
+                .Select(pm => pm.StaffId)
+                .ToHashSet();
+
+            // Group per staff, apply text filter and compute ToDay — all in memory
+            string f = filter.ToLower();
+            bool showAll = f == "%";
+            var staffResult = allRegistered
+                .Where(item => !checkedInStaffIds.Contains(item.StaffId))
+                .GroupBy(item => new { item.StaffId, item.Name })
+                .Select(group => new
+                {
+                    group.Key.StaffId,
+                    group.Key.Name,
+                    Key1 = group.First().Key1,
+                    Key2 = group.First().Key2,
+                    Key3 = group.First().Key3,
+                    ToDay = group.Any(item => item.ShiftStart >= today && item.ShiftStart < todayEnd) ? 1 : 0
+                })
+                .Where(item => showAll ||
+                    item.Name.Contains(f, StringComparison.OrdinalIgnoreCase) ||
+                    (item.Key1 != null && item.Key1.Contains(f, StringComparison.OrdinalIgnoreCase)) ||
+                    (item.Key2 != null && item.Key2.Contains(f, StringComparison.OrdinalIgnoreCase)) ||
+                    (item.Key3 != null && item.Key3.Contains(f, StringComparison.OrdinalIgnoreCase)))
                 .OrderBy(item => item.Name)
                 .Take(10)
-                .ToList()
-                .Select(item => new
-                {
-                    item.StaffId,
-                    item.Name,
-                    ToDay = item.ToDay ? 1 : 0
-                })
                 .ToList();
             #endregion
 
             #region Generate Html
             html = $"<table width=\"100%\">";
 
-            foreach (var staff in staffItems)
+            foreach (var staff in staffResult)
             {
                 html += $"<tr>" +
                     $"<td align=\"left\" valign=\"middle\">" +
@@ -1179,7 +1195,7 @@ namespace ShiftHub.Controllers
                     $"</td>" +
                 $"</tr>";
             }
-            if (staffItems.Count == 0)
+            if (staffResult.Count == 0)
             {
                 html += $"<tr><td align=\"center\"><i>Ingen fundet</i></td></tr>";
             }
